@@ -5,7 +5,7 @@ import pytest
 import re
 
 MUSIC_DIR="/data/Music/"
-EXPECTED_MEDIA_COUNT=11435
+EXPECTED_MEDIA_COUNT=11549
 
 # intentionally lowercase for consistency, ".JPG" not allowed, etc.
 EXTS_MEDIA = ['mp3', 'm4a']
