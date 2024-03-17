@@ -4,6 +4,7 @@ import os
 import re
 
 MEDIA_PATH = "/data/Music/"
+# MEDIA_PATH = "D:\\Music\\"
 EXPECTED_MEDIA_COUNT = 13260
 EXPECTED_LRC_COUNT = 6427
 
@@ -29,6 +30,10 @@ def media_path():
 def get_file_ext(path: str) -> str:
     _, ext = os.path.splitext(path)
     return ext.strip(".")
+
+
+def get_path_depth(path: str):
+    return len(path.strip(os.path.sep).split(os.path.sep))
 
 
 def test_allowed_exts(media_path: str):
@@ -99,17 +104,17 @@ def directory_contains_cover_jpg(path: str) -> bool:
 
 
 def test_no_empty_dirs(media_path: str):
-    baselevel = len(media_path.split(os.path.sep))
+    base_depth = get_path_depth(media_path)
     for root, dirs, _ in os.walk(media_path, topdown=False):
         for name in dirs:
             fullpath = os.path.join(root, name)
-            curlevel = len(fullpath.split(os.path.sep))
-            level = curlevel - baselevel
-            # 0 = artist dir
-            if level == 0:
+            current_depth = get_path_depth(fullpath)
+            relative_depth = current_depth - base_depth
+            # 1 = artist dir
+            if relative_depth == 1:
                 assert_directory_contains_subdirectories(fullpath)
-            # 1 = album [year] dir
-            elif level == 1:
+            # 2 = album [year] dir
+            elif relative_depth == 2:
                 assert_directory_contains_media(fullpath)
             else:
                 assert False, "folder nested too deep: {}".format(fullpath)
@@ -126,16 +131,16 @@ def test_album_dir_name(media_path: str):
     # prohibit chars not allowed in windows filenames
     # and other problematic characters
     album_pattern = re.compile(r'[^:\?&#%{}\\\.`$!<>\*"+|=]*\[\d+(-\d+)?\]')
-    baselevel = len(media_path.split(os.path.sep))
+    base_depth = get_path_depth(media_path)
     count = 0
     match_count = 0
     for root, dirs, _ in os.walk(media_path, topdown=False):
         for name in dirs:
             fullpath = os.path.join(root, name)
-            curlevel = len(fullpath.split(os.path.sep))
-            # 0 = artist
-            # 1 = album [year]
-            if curlevel - baselevel == 1:
+            current_depth = get_path_depth(fullpath)
+            # 1 = artist dir
+            # 2 = album [year] dir
+            if current_depth - base_depth == 2:
                 count += 1
                 if album_pattern.match(name) and not string_contains_trailing_space(
                     name
@@ -160,16 +165,16 @@ def test_album_dir_name(media_path: str):
 
 
 def test_album_cover_jpg(media_path: str):
-    baselevel = len(media_path.split(os.path.sep))
+    base_depth = get_path_depth(media_path)
     count = 0
     match_count = 0
     for root, dirs, _ in os.walk(media_path, topdown=False):
         for name in dirs:
             fullpath = os.path.join(root, name)
-            curlevel = len(fullpath.split(os.path.sep))
-            # 0 = artist
-            # 1 = album [year]
-            if curlevel - baselevel == 1:
+            current_depth = get_path_depth(fullpath)
+            # 1 = artist dir
+            # 2 = album [year] dir
+            if current_depth - base_depth == 2:
                 count += 1
                 if directory_contains_cover_jpg(fullpath):
                     match_count += 1
