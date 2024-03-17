@@ -4,7 +4,7 @@ import os
 import re
 
 MEDIA_PATH = "/data/Music/"
-# MEDIA_PATH = "D:\\Music\\"
+ALT_MEDIA_PATH = "D:\\Music\\"
 EXPECTED_MEDIA_COUNT = 13260
 EXPECTED_LRC_COUNT = 6427
 
@@ -24,7 +24,10 @@ ALLOWED_EXTS = EXTS_MEDIA + EXTS_ART + EXTS_LYRICS + EXTS_EXTRA
 
 @pytest.fixture(scope="session")
 def media_path():
-    return MEDIA_PATH
+    if os.path.exists(MEDIA_PATH):
+        return MEDIA_PATH
+    else:
+        return ALT_MEDIA_PATH
 
 
 def get_file_ext(path: str) -> str:
@@ -145,7 +148,13 @@ def test_album_dir_name(media_path: str):
                 if album_pattern.match(name) and not string_contains_trailing_space(
                     name
                 ):
-                    match_count += 1
+                    # test album year format (4 digits)
+                    album_year = 0
+                    try:
+                        album_year = int(re.findall("\[(\d{4})\]", name)[-1])
+                        match_count += 1
+                    except Exception as e:
+                        print("bad album dir name format (invalid year): {}".format(fullpath))
                 else:
                     print("bad album dir name format: {}".format(fullpath))
     print(
