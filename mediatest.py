@@ -1,15 +1,29 @@
 # !/usr/bin/python3
+import pytest
 import os
 import re
 
-MUSIC_DIR = "/data/Music/"
-EXPECTED_MEDIA_COUNT = 12261
+MEDIA_PATH = "/data/Music/"
+EXPECTED_MEDIA_COUNT = 13260
+EXPECTED_LRC_COUNT = 6427
+
+# MEDIA_PATH = "/media/brett/MUSIC_20240107/Music/"
+# EXPECTED_MEDIA_COUNT = 12082
+
+# MEDIA_PATH = "/media/brett/MUSIC-2023-10-15/Music/"
+# EXPECTED_MEDIA_COUNT = 11434
 
 # intentionally lowercase for consistency, ".JPG" not allowed, etc.
 EXTS_MEDIA = ["mp3", "m4a"]
 EXTS_ART = ["jpg", "webp", "png"]
+EXTS_LYRICS = ["lrc", "txt"]
 EXTS_EXTRA = ["pdf"]
-ALLOWED_EXTS = EXTS_MEDIA + EXTS_ART + EXTS_EXTRA
+ALLOWED_EXTS = EXTS_MEDIA + EXTS_ART + EXTS_LYRICS + EXTS_EXTRA
+
+
+@pytest.fixture(scope="session")
+def media_path():
+    return MEDIA_PATH
 
 
 def get_file_ext(path: str) -> str:
@@ -17,20 +31,22 @@ def get_file_ext(path: str) -> str:
     return ext.strip(".")
 
 
-def test_allowed_exts():
+def test_allowed_exts(media_path: str):
     count = 0
-    for _, _, files in os.walk(MUSIC_DIR, topdown=False):
+    for _, _, files in os.walk(media_path, topdown=False):
         for name in files:
             ext = get_file_ext(name)
             assert ext in ALLOWED_EXTS, "{} not in allowed extensions".format(name)
     print(count)
 
 
-def test_media_file_count():
+def test_media_file_count(media_path: str):
     count_media = 0
     count_mp3 = 0
     count_m4a = 1
-    for _, _, files in os.walk(MUSIC_DIR, topdown=False):
+    count_lrc = 0  # synced lyrics
+    count_txt = 0  # unsynced lyrics
+    for _, _, files in os.walk(media_path, topdown=False):
         for name in files:
             ext = get_file_ext(name)
             if ext in EXTS_MEDIA:
@@ -39,10 +55,18 @@ def test_media_file_count():
                 count_mp3 += 1
             elif ext == "m4a":
                 count_m4a += 1
+            elif ext == "lrc":
+                count_lrc += 1
+            elif ext == "txt":
+                count_txt += 1
     print("count_mp3={}".format(count_mp3))
     print("count_m4a={}".format(count_m4a))
     print("count_media={}".format(count_media))
+    print("count_lrc={}".format(count_lrc))
+    print("count_txt={}".format(count_txt))
+    print("missing lrc count={}".format(count_media - count_lrc))
     assert count_media == EXPECTED_MEDIA_COUNT
+    assert count_lrc == EXPECTED_LRC_COUNT
 
 
 def assert_directory_contains_media(path: str):
@@ -74,9 +98,9 @@ def directory_contains_cover_jpg(path: str) -> bool:
     return "cover.jpg" in os.listdir(path)
 
 
-def test_no_empty_dirs():
-    baselevel = len(MUSIC_DIR.split(os.path.sep))
-    for root, dirs, _ in os.walk(MUSIC_DIR, topdown=False):
+def test_no_empty_dirs(media_path: str):
+    baselevel = len(media_path.split(os.path.sep))
+    for root, dirs, _ in os.walk(media_path, topdown=False):
         for name in dirs:
             fullpath = os.path.join(root, name)
             curlevel = len(fullpath.split(os.path.sep))
@@ -98,14 +122,14 @@ def string_contains_trailing_space(s: str) -> bool:
 
 
 # @pytest.mark.skip(reason="wip")
-def test_album_dir_name():
+def test_album_dir_name(media_path: str):
     # prohibit chars not allowed in windows filenames
     # and other problematic characters
     album_pattern = re.compile(r'[^:\?&#%{}\\\.`$!<>\*"+|=]*\[\d+(-\d+)?\]')
-    baselevel = len(MUSIC_DIR.split(os.path.sep))
+    baselevel = len(media_path.split(os.path.sep))
     count = 0
     match_count = 0
-    for root, dirs, _ in os.walk(MUSIC_DIR, topdown=False):
+    for root, dirs, _ in os.walk(media_path, topdown=False):
         for name in dirs:
             fullpath = os.path.join(root, name)
             curlevel = len(fullpath.split(os.path.sep))
@@ -135,11 +159,11 @@ def test_album_dir_name():
 # TODO: Validate filenames, prohibited chars in filenames
 
 
-def test_album_cover_jpg():
-    baselevel = len(MUSIC_DIR.split(os.path.sep))
+def test_album_cover_jpg(media_path: str):
+    baselevel = len(media_path.split(os.path.sep))
     count = 0
     match_count = 0
-    for root, dirs, _ in os.walk(MUSIC_DIR, topdown=False):
+    for root, dirs, _ in os.walk(media_path, topdown=False):
         for name in dirs:
             fullpath = os.path.join(root, name)
             curlevel = len(fullpath.split(os.path.sep))
