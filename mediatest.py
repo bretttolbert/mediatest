@@ -2,17 +2,24 @@
 import pytest
 import os
 import re
+from typing import List
 
-MEDIA_PATH = "/data/Music/"
-ALT_MEDIA_PATH = "D:\\Music\\"
-EXPECTED_MEDIA_COUNT = 13260
-EXPECTED_LRC_COUNT = 6427
+"""
+I run this script with pytest to keep my music folders organized.
+"""
 
-# MEDIA_PATH = "/media/brett/MUSIC_20240107/Music/"
-# EXPECTED_MEDIA_COUNT = 12082
+# LIB1 is my primary music library
+LIB1_MEDIA_PATH = "/data/Music/"
+LIB1_EXPECTED_MEDIA_COUNT = 13771
+LIB1_EXPECTED_LRC_COUNT = 6268
+LIB1_TOTAL_FILESIZE_LIMIT_GB = (
+    96  # Goal: Keep LIB1 small enough to fit on 128 GB tablets
+)
 
-# MEDIA_PATH = "/media/brett/MUSIC-2023-10-15/Music/"
-# EXPECTED_MEDIA_COUNT = 11434
+# LIB2 is for everything that doesn't fit in LIB1
+LIB2_MEDIA_PATH = "/data/MusicOther/"
+LIB2_EXPECTED_MEDIA_COUNT = 1210
+LIB2_EXPECTED_LRC_COUNT = 217
 
 # intentionally lowercase for consistency, ".JPG" not allowed, etc.
 EXTS_MEDIA = ["mp3", "m4a"]
@@ -22,14 +29,6 @@ EXTS_EXTRA = ["pdf"]
 ALLOWED_EXTS = EXTS_MEDIA + EXTS_ART + EXTS_LYRICS + EXTS_EXTRA
 
 
-@pytest.fixture(scope="session")
-def media_path():
-    if os.path.exists(MEDIA_PATH):
-        return MEDIA_PATH
-    else:
-        return ALT_MEDIA_PATH
-
-
 def get_file_ext(path: str) -> str:
     _, ext = os.path.splitext(path)
     return ext.strip(".")
@@ -37,44 +36,6 @@ def get_file_ext(path: str) -> str:
 
 def get_path_depth(path: str):
     return len(path.strip(os.path.sep).split(os.path.sep))
-
-
-def test_allowed_exts(media_path: str):
-    count = 0
-    for _, _, files in os.walk(media_path, topdown=False):
-        for name in files:
-            ext = get_file_ext(name)
-            assert ext in ALLOWED_EXTS, "{} not in allowed extensions".format(name)
-    print(count)
-
-
-def test_media_file_count(media_path: str):
-    count_media = 0
-    count_mp3 = 0
-    count_m4a = 1
-    count_lrc = 0  # synced lyrics
-    count_txt = 0  # unsynced lyrics
-    for _, _, files in os.walk(media_path, topdown=False):
-        for name in files:
-            ext = get_file_ext(name)
-            if ext in EXTS_MEDIA:
-                count_media += 1
-            if ext == "mp3":
-                count_mp3 += 1
-            elif ext == "m4a":
-                count_m4a += 1
-            elif ext == "lrc":
-                count_lrc += 1
-            elif ext == "txt":
-                count_txt += 1
-    print("count_mp3={}".format(count_mp3))
-    print("count_m4a={}".format(count_m4a))
-    print("count_media={}".format(count_media))
-    print("count_lrc={}".format(count_lrc))
-    print("count_txt={}".format(count_txt))
-    print("missing lrc count={}".format(count_media - count_lrc))
-    assert count_media == EXPECTED_MEDIA_COUNT
-    assert count_lrc == EXPECTED_LRC_COUNT
 
 
 def assert_directory_contains_media(path: str):
@@ -106,7 +67,53 @@ def directory_contains_cover_jpg(path: str) -> bool:
     return "cover.jpg" in os.listdir(path)
 
 
-def test_no_empty_dirs(media_path: str):
+def string_contains_trailing_space(s: str) -> bool:
+    """Trailing space can causes problems e.g. when burning to a BluRay on Windows,
+    I was getting 'file not found' errors for some albums that had trailing space"""
+    return bool(s != s.strip())
+
+
+def do_test_allowed_exts(media_path: str):
+    count = 0
+    for _, _, files in os.walk(media_path, topdown=False):
+        for name in files:
+            ext = get_file_ext(name)
+            assert ext in ALLOWED_EXTS, "{} not in allowed extensions".format(name)
+    print(count)
+
+
+def do_test_media_file_count(
+    media_path: str, expected_media_count: int, expected_lrc_count: int
+):
+    count_media = 0
+    count_mp3 = 0
+    count_m4a = 1
+    count_lrc = 0  # synced lyrics
+    count_txt = 0  # unsynced lyrics
+    for _, _, files in os.walk(media_path, topdown=False):
+        for name in files:
+            ext = get_file_ext(name)
+            if ext in EXTS_MEDIA:
+                count_media += 1
+            if ext == "mp3":
+                count_mp3 += 1
+            elif ext == "m4a":
+                count_m4a += 1
+            elif ext == "lrc":
+                count_lrc += 1
+            elif ext == "txt":
+                count_txt += 1
+    print("count_mp3={}".format(count_mp3))
+    print("count_m4a={}".format(count_m4a))
+    print("count_media={}".format(count_media))
+    print("count_lrc={}".format(count_lrc))
+    print("count_txt={}".format(count_txt))
+    print("missing lrc count={}".format(count_media - count_lrc))
+    assert count_media == expected_media_count
+    assert count_lrc == expected_lrc_count
+
+
+def do_test_no_empty_dirs(media_path: str):
     base_depth = get_path_depth(media_path)
     for root, dirs, _ in os.walk(media_path, topdown=False):
         for name in dirs:
@@ -123,14 +130,8 @@ def test_no_empty_dirs(media_path: str):
                 assert False, "folder nested too deep: {}".format(fullpath)
 
 
-def string_contains_trailing_space(s: str) -> bool:
-    """Trailing space can causes problems e.g. when burning to a BluRay on Windows,
-    I was getting 'file not found' errors for some albums that had trailing space"""
-    return bool(s != s.strip())
-
-
 # @pytest.mark.skip(reason="wip")
-def test_album_dir_name(media_path: str):
+def do_test_album_dir_name(media_path: str):
     # prohibit chars not allowed in windows filenames
     # and other problematic characters
     album_pattern = re.compile(r'[^:\?&#%{}\\\.`$!<>\*"+|=]*\[\d+(-\d+)?\]')
@@ -151,10 +152,16 @@ def test_album_dir_name(media_path: str):
                     # test album year format (4 digits)
                     album_year = 0
                     try:
-                        album_year = int(re.findall("\[(\d{4})\]", name)[-1])
+                        tokens: List[str] = re.findall(r"\[(\d{4})\]", name)
+                        album_year = int(tokens[-1])
                         match_count += 1
-                    except Exception as e:
-                        print("bad album dir name format (invalid year): {}".format(fullpath))
+                        print(album_year)
+                    except Exception:
+                        print(
+                            "bad album dir name format (invalid year): {}".format(
+                                fullpath
+                            )
+                        )
                 else:
                     print("bad album dir name format: {}".format(fullpath))
     print(
@@ -173,7 +180,7 @@ def test_album_dir_name(media_path: str):
 # TODO: Validate filenames, prohibited chars in filenames
 
 
-def test_album_cover_jpg(media_path: str):
+def do_test_album_cover_jpg(media_path: str):
     base_depth = get_path_depth(media_path)
     count = 0
     match_count = 0
@@ -200,3 +207,57 @@ def test_album_cover_jpg(media_path: str):
         )
     )
     assert count == match_count, "One or more album dirs missing cover.jpg"
+
+
+# begin tests
+
+
+@pytest.mark.parametrize("media_path", [LIB1_MEDIA_PATH, LIB2_MEDIA_PATH])
+def test_allowed_exts(media_path: str):
+    do_test_allowed_exts(media_path)
+
+
+@pytest.mark.parametrize(
+    "media_path,expected_media_count,expected_lrc_count",
+    [
+        (LIB1_MEDIA_PATH, LIB1_EXPECTED_MEDIA_COUNT, LIB1_EXPECTED_LRC_COUNT),
+        (LIB2_MEDIA_PATH, LIB2_EXPECTED_MEDIA_COUNT, LIB2_EXPECTED_LRC_COUNT),
+    ],
+)
+def test_media_file_count(
+    media_path: str, expected_media_count: int, expected_lrc_count: int
+):
+    do_test_media_file_count(media_path, expected_media_count, expected_lrc_count)
+
+
+@pytest.mark.parametrize("media_path", [LIB1_MEDIA_PATH, LIB2_MEDIA_PATH])
+def test_no_empty_dirs(media_path: str):
+    do_test_allowed_exts(media_path)
+
+
+@pytest.mark.parametrize("media_path", [LIB1_MEDIA_PATH, LIB2_MEDIA_PATH])
+def test_album_dir_name(media_path: str):
+    do_test_album_dir_name(media_path)
+
+
+@pytest.mark.parametrize("media_path", [LIB1_MEDIA_PATH, LIB2_MEDIA_PATH])
+def test_album_cover_jpg(media_path: str):
+    do_test_album_cover_jpg(media_path)
+
+
+def test_lib1_max_filesize():
+    """Ensures that the total filesize of my LIB1 folder does not exceed
+    LIB1_TOTAL_FILESIZE_LIMIT_GB
+    Reason: I sync LIB1 (my primary music collection) to my 128 GB tablet,
+    so I need to keep it small enough to fit on said tablet.
+    I put all my other music in LIB2 (MusicOther), where the size is not limited.
+    """
+    size = 0
+    for path, _, files in os.walk(LIB1_MEDIA_PATH):
+        for f in files:
+            fp = os.path.join(path, f)
+            size += os.stat(fp).st_size
+    print(size)
+    size_gb = size / 1024**3
+    print("size_gb=", size_gb)
+    assert size_gb < LIB1_TOTAL_FILESIZE_LIMIT_GB
