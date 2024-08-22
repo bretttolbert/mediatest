@@ -1,25 +1,38 @@
 # !/usr/bin/python3
+from __future__ import annotations
+import yaml
 import pytest
 import os
 import re
+import sys
 from typing import List
+
+from dataclasses import dataclass
+from datetime import time
+
+from dataclass_wizard import YAMLWizard  # type: ignore
 
 """
 I run this script with pytest to keep my music folders organized.
 """
 
+# For running tests on the yaml file output by mediascan
+# E.g. for ID3-tag tests
+# E.g. testing if year is a valid year or something weird like 0
+MEDIASCAN_FILES_PATH = "../mediascan/files.yaml"
+
 # LIB1 is my primary music library
 LIB1_MEDIA_PATH = "/data/Music/"
-LIB1_EXPECTED_MEDIA_COUNT = 13771
-LIB1_EXPECTED_LRC_COUNT = 6268
+LIB1_EXPECTED_MEDIA_COUNT = 13512
+LIB1_EXPECTED_LRC_COUNT = 5969
 LIB1_TOTAL_FILESIZE_LIMIT_GB = (
     96  # Goal: Keep LIB1 small enough to fit on 128 GB tablets
 )
 
 # LIB2 is for everything that doesn't fit in LIB1
 LIB2_MEDIA_PATH = "/data/MusicOther/"
-LIB2_EXPECTED_MEDIA_COUNT = 1210
-LIB2_EXPECTED_LRC_COUNT = 217
+LIB2_EXPECTED_MEDIA_COUNT = 1845
+LIB2_EXPECTED_LRC_COUNT = 516
 
 # intentionally lowercase for consistency, ".JPG" not allowed, etc.
 EXTS_MEDIA = ["mp3", "m4a"]
@@ -27,6 +40,57 @@ EXTS_ART = ["jpg", "webp", "png"]
 EXTS_LYRICS = ["lrc", "txt"]
 EXTS_EXTRA = ["pdf"]
 ALLOWED_EXTS = EXTS_MEDIA + EXTS_ART + EXTS_LYRICS + EXTS_EXTRA
+
+
+@dataclass
+class Mediafile:
+    """
+    Mediafile dataclass
+
+    """
+
+    path: str
+    size: int
+    format: str
+    title: str | int | float | bool
+    artist: str | bool | int
+    album: str | int | float | bool | time
+    genre: str
+    year: int
+    duration: int
+
+
+@dataclass
+class Data(YAMLWizard):
+    """
+    Data dataclass
+
+    """
+
+    mediafiles: list[Mediafile]
+
+
+@pytest.fixture(scope="session")
+def files_yaml_file() -> Data:
+    yaml_fname: str = MEDIASCAN_FILES_PATH
+    data = None
+    with open(yaml_fname, "r") as stream:
+        try:
+            data = Data.from_yaml(stream)  # type: ignore
+        except yaml.YAMLError as exc:
+            print(exc)
+            sys.exit(1)
+    return data  # type: ignore
+
+
+def test_yaml_no_zero_years(files_yaml_file: Data):
+    for f in files_yaml_file.mediafiles:
+        assert f.year > 0
+
+
+def test_yaml_no_years_gt_present(files_yaml_file: Data):
+    for f in files_yaml_file.mediafiles:
+        assert f.year <= 2024
 
 
 def get_file_ext(path: str) -> str:
@@ -245,7 +309,7 @@ def test_album_cover_jpg(media_path: str):
     do_test_album_cover_jpg(media_path)
 
 
-def test_lib1_max_filesize():
+def test_lib1_total_filesize_limit():
     """Ensures that the total filesize of my LIB1 folder does not exceed
     LIB1_TOTAL_FILESIZE_LIMIT_GB
     Reason: I sync LIB1 (my primary music collection) to my 128 GB tablet,
