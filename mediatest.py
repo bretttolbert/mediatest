@@ -18,6 +18,7 @@ I run this script with pytest to keep my music folders organized.
 
 MEGABYTE = 10**6
 KILOBYTE = 10**3
+PRESENT_YEAR: int = datetime.now().year
 
 # For running tests on the yaml file output by mediascan
 # E.g. for ID3-tag tests
@@ -283,9 +284,7 @@ class Data(YAMLWizard):
     mediafiles: list[Mediafile]
 
 
-@pytest.fixture(scope="session")
-def files_yaml_file() -> Data:
-    yaml_fname: str = MEDIASCAN_FILES_PATH
+def load_yaml_file(yaml_fname: str) -> Data:
     data = None
     with open(yaml_fname, "r") as stream:
         try:
@@ -294,6 +293,14 @@ def files_yaml_file() -> Data:
             print(exc)
             sys.exit(1)
     return data  # type: ignore
+
+
+files = load_yaml_file(MEDIASCAN_FILES_PATH)
+
+
+@pytest.fixture(scope="session")
+def files_yaml_file() -> Data:
+    return load_yaml_file(MEDIASCAN_FILES_PATH)
 
 
 def get_file_ext(path: str) -> str:
@@ -539,25 +546,24 @@ def test_lib_total_filesize_limit(media_path: str, limit: int):
 # begin mediascan yaml tests
 
 
-def test_yaml_year_gt_zero(files_yaml_file: Data):
-    for f in files_yaml_file.mediafiles:
-        assert f.year > 0
+@pytest.mark.parametrize("file", files.mediafiles)
+def test_yaml_year_gt_zero(file: Mediafile):
+    assert file.year > 0, f"{file.path}"
 
 
-def test_yaml_years_lt_present(files_yaml_file: Data):
-    present_year: int = datetime.now().year
-    for f in files_yaml_file.mediafiles:
-        assert f.year <= present_year
+@pytest.mark.parametrize("file", files.mediafiles)
+def test_yaml_years_lt_present(file: Mediafile):
+    assert file.year <= PRESENT_YEAR, f"{file.path}"
 
 
-def test_yaml_size_gt_min(files_yaml_file: Data):
-    for f in files_yaml_file.mediafiles:
-        assert f.size >= MINIMUM_FILESIZE
+@pytest.mark.parametrize("file", files.mediafiles)
+def test_yaml_size_gt_min(file: Mediafile):
+    assert file.size >= MINIMUM_FILESIZE, f"{file.path}"
 
 
-def test_yaml_allowed_genres(files_yaml_file: Data):
-    for f in files_yaml_file.mediafiles:
-        assert f.genre in ALLOWED_GENRES
+@pytest.mark.parametrize("file", files.mediafiles)
+def test_yaml_allowed_genres(file: Mediafile):
+    assert file.genre in ALLOWED_GENRES, f"{file.path}"
 
 
 # end mediascan yaml tests
