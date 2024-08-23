@@ -8,7 +8,7 @@ import sys
 from typing import List
 
 from dataclasses import dataclass
-from datetime import time
+from datetime import datetime, time
 
 from dataclass_wizard import YAMLWizard  # type: ignore
 
@@ -89,8 +89,9 @@ def test_yaml_no_zero_years(files_yaml_file: Data):
 
 
 def test_yaml_no_years_gt_present(files_yaml_file: Data):
+    present_year: int = datetime.now().year
     for f in files_yaml_file.mediafiles:
-        assert f.year <= 2024
+        assert f.year <= present_year
 
 
 def get_file_ext(path: str) -> str:
