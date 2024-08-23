@@ -214,7 +214,6 @@ ALLOWED_GENRES = [
     "Stoner Rock",
     "Surf Punk",
     "Surf Rock",
-    "Surf rock",
     "Swing",
     "Synth-pop",
     "Synthpop",
