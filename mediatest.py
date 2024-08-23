@@ -16,23 +16,28 @@ from dataclass_wizard import YAMLWizard  # type: ignore
 I run this script with pytest to keep my music folders organized.
 """
 
+MEGABYTE = 10**6
+KILOBYTE = 10**3
+
 # For running tests on the yaml file output by mediascan
 # E.g. for ID3-tag tests
 # E.g. testing if year is a valid year or something weird like 0
 MEDIASCAN_FILES_PATH = "../mediascan/files.yaml"
+MINIMUM_FILESIZE = 10 * KILOBYTE
 
 # LIB1 is my primary music library
 LIB1_MEDIA_PATH = "/data/Music/"
 LIB1_EXPECTED_MEDIA_COUNT = 13512
 LIB1_EXPECTED_LRC_COUNT = 5969
-LIB1_TOTAL_FILESIZE_LIMIT_GB = (
-    96  # Goal: Keep LIB1 small enough to fit on 128 GB tablets
-)
+# Goal: Keep LIB1 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
+LIB1_TOTAL_FILESIZE_LIMIT_GB = 96
 
 # LIB2 is for everything that doesn't fit in LIB1
 LIB2_MEDIA_PATH = "/data/MusicOther/"
 LIB2_EXPECTED_MEDIA_COUNT = 1845
 LIB2_EXPECTED_LRC_COUNT = 516
+# Goal: Keep LIB2 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
+LIB2_TOTAL_FILESIZE_LIMIT_GB = 96
 
 # intentionally lowercase for consistency, ".JPG" not allowed, etc.
 EXTS_MEDIA = ["mp3", "m4a"]
@@ -81,17 +86,6 @@ def files_yaml_file() -> Data:
             print(exc)
             sys.exit(1)
     return data  # type: ignore
-
-
-def test_yaml_no_zero_years(files_yaml_file: Data):
-    for f in files_yaml_file.mediafiles:
-        assert f.year > 0
-
-
-def test_yaml_no_years_gt_present(files_yaml_file: Data):
-    present_year: int = datetime.now().year
-    for f in files_yaml_file.mediafiles:
-        assert f.year <= present_year
 
 
 def get_file_ext(path: str) -> str:
@@ -274,7 +268,7 @@ def do_test_album_cover_jpg(media_path: str):
     assert count == match_count, "One or more album dirs missing cover.jpg"
 
 
-# begin tests
+# begin filesystem tests
 
 
 @pytest.mark.parametrize("media_path", [LIB1_MEDIA_PATH, LIB2_MEDIA_PATH])
@@ -310,19 +304,47 @@ def test_album_cover_jpg(media_path: str):
     do_test_album_cover_jpg(media_path)
 
 
-def test_lib1_total_filesize_limit():
+@pytest.mark.parametrize(
+    "media_path,limit",
+    [
+        (LIB1_MEDIA_PATH, LIB1_TOTAL_FILESIZE_LIMIT_GB),
+        (LIB2_MEDIA_PATH, LIB2_TOTAL_FILESIZE_LIMIT_GB),
+    ],
+)
+def test_lib_total_filesize_limit(media_path: str, limit: int):
     """Ensures that the total filesize of my LIB1 folder does not exceed
     LIB1_TOTAL_FILESIZE_LIMIT_GB
-    Reason: I sync LIB1 (my primary music collection) to my 128 GB tablet,
-    so I need to keep it small enough to fit on said tablet.
-    I put all my other music in LIB2 (MusicOther), where the size is not limited.
     """
     size = 0
-    for path, _, files in os.walk(LIB1_MEDIA_PATH):
+    for path, _, files in os.walk(media_path):
         for f in files:
             fp = os.path.join(path, f)
             size += os.stat(fp).st_size
     print(size)
     size_gb = size / 1024**3
     print("size_gb=", size_gb)
-    assert size_gb < LIB1_TOTAL_FILESIZE_LIMIT_GB
+    assert size_gb < limit
+
+
+# end filesystem tests
+
+# begin mediascan yaml tests
+
+
+def test_yaml_year_gt_zero(files_yaml_file: Data):
+    for f in files_yaml_file.mediafiles:
+        assert f.year > 0
+
+
+def test_yaml_years_lt_present(files_yaml_file: Data):
+    present_year: int = datetime.now().year
+    for f in files_yaml_file.mediafiles:
+        assert f.year <= present_year
+
+
+def test_yaml_size_gt_min(files_yaml_file: Data):
+    for f in files_yaml_file.mediafiles:
+        assert f.size >= MINIMUM_FILESIZE
+
+
+# end mediascan yaml tests
