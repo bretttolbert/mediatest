@@ -145,7 +145,6 @@ ALLOWED_GENRES = [
     "Metal",
     "Metalcore",
     "Motown",
-    "Neo Soul",
     "Neo-Soul",
     "New Age",
     "New Disco",
