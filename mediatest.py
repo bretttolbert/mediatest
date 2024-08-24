@@ -27,7 +27,6 @@ MEDIASCAN_FILES_PATH = "../mediascan/files.yaml"
 MINIMUM_FILESIZE = 10 * KILOBYTE
 
 ALLOWED_GENRES = [
-    "Acid Jazz",
     "Acid Punk",
     "Acid Rock",
     "Afrobeat",
@@ -58,12 +57,10 @@ ALLOWED_GENRES = [
     "Cumbia",
     "Dabke",
     "Dance/Electronic",
-    "Dance/Hip-Hop",
     "Death Metal",
     "Deep House",
     "Dirty Blues",
     "Disco",
-    "Disco/Soul",
     "Dixieland Jazz",
     "Doo-wop",
     "Doom Metal",
@@ -71,7 +68,6 @@ ALLOWED_GENRES = [
     "Dream Pop",
     "Drumline",
     "Easy Listening",
-    "Electro",
     "Electronic",
     "Electronic (Instrumental)",
     "Electronica",
@@ -92,7 +88,6 @@ ALLOWED_GENRES = [
     "Funk Rock",
     "Funk/Soul",
     "Funktronica",
-    "Genesis",
     "Glam Rock",
     "Gospel",
     "Goth Rock",
@@ -187,7 +182,6 @@ ALLOWED_GENRES = [
     "Techno",
     "Thrash Metal",
     "Traditional Pop",
-    "Trance",
     "Trip hop",
     "Ukrainian Pop",
     "Urbano",
@@ -197,7 +191,7 @@ ALLOWED_GENRES = [
 
 # LIB1 is my primary music library
 LIB1_MEDIA_PATH = "/data/Music/"
-LIB1_EXPECTED_MEDIA_COUNT = 13512
+LIB1_EXPECTED_MEDIA_COUNT = 13515
 LIB1_EXPECTED_LRC_COUNT = 5969
 # Goal: Keep LIB1 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
 LIB1_TOTAL_FILESIZE_LIMIT_GB = 96
