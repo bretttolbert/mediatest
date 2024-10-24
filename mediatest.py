@@ -35,6 +35,7 @@ ALLOWED_GENRES = [
     "Alternative Metal",
     "Alternative Rock",
     "Art Rock",
+    "Art Punk",
     "Big Band",
     "Black Metal",
     "Bluegrass",
@@ -166,6 +167,7 @@ ALLOWED_GENRES = [
     "Rock italiano",
     "Rockabilly",
     "Russian Folk",
+    "Russian Pop",
     "Shoegaze",
     "Ska Punk",
     "Soft Rock",
@@ -191,15 +193,17 @@ ALLOWED_GENRES = [
 
 # LIB1 is my primary music library
 LIB1_MEDIA_PATH = "/data/Music/"
-LIB1_EXPECTED_MEDIA_COUNT = 13651
-LIB1_EXPECTED_LRC_COUNT = 5969
+LIB1_EXPECTED_MEDIA_COUNT = 13547
+LIB1_EXPECTED_LRC_COUNT = 5802
 # Goal: Keep LIB1 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
 LIB1_TOTAL_FILESIZE_LIMIT_GB = 96
 
 # LIB2 is for everything that doesn't fit in LIB1
+# LIB2 is for all the music that isn't suitable for parties
+# LIB2 genres: classical music, classic country, soundtracks
 LIB2_MEDIA_PATH = "/data/MusicOther/"
-LIB2_EXPECTED_MEDIA_COUNT = 1848
-LIB2_EXPECTED_LRC_COUNT = 516
+LIB2_EXPECTED_MEDIA_COUNT = 2278
+LIB2_EXPECTED_LRC_COUNT = 683
 # Goal: Keep LIB2 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
 LIB2_TOTAL_FILESIZE_LIMIT_GB = 96
 
