@@ -26,6 +26,29 @@ PRESENT_YEAR: int = datetime.now().year
 MEDIASCAN_FILES_PATH = "../mediascan/files.yaml"
 MINIMUM_FILESIZE = 10 * KILOBYTE
 
+# LIB1 is my primary music library
+LIB1_MEDIA_PATH = "/data/Music/"
+LIB1_EXPECTED_MEDIA_COUNT = 13215
+LIB1_EXPECTED_LRC_COUNT = 5750
+# Goal: Keep LIB1 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
+LIB1_TOTAL_FILESIZE_LIMIT_GB = 96
+
+# LIB2 is for everything that doesn't fit in LIB1
+# LIB2 is for all the music that isn't suitable for parties
+# LIB2 genres: classical music, classic country, soundtracks
+LIB2_MEDIA_PATH = "/data/MusicOther/"
+LIB2_EXPECTED_MEDIA_COUNT = 2636
+LIB2_EXPECTED_LRC_COUNT = 735
+# Goal: Keep LIB2 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
+LIB2_TOTAL_FILESIZE_LIMIT_GB = 96
+
+# intentionally lowercase for consistency, ".JPG" not allowed, etc.
+EXTS_MEDIA = ["mp3", "m4a"]
+EXTS_ART = ["jpg", "webp", "png"]
+EXTS_LYRICS = ["lrc", "txt"]
+EXTS_EXTRA = ["pdf"]
+ALLOWED_EXTS = EXTS_MEDIA + EXTS_ART + EXTS_LYRICS + EXTS_EXTRA
+
 ALLOWED_GENRES = [
     "Acid Punk",
     "Acid Rock",
@@ -34,6 +57,7 @@ ALLOWED_GENRES = [
     "Alternative",
     "Alternative Metal",
     "Alternative Rock",
+    "Ambient",
     "Art Rock",
     "Art Punk",
     "Big Band",
@@ -155,6 +179,7 @@ ALLOWED_GENRES = [
     "Punk Rock",
     "Punk français",
     "R&B",
+    "R&B/Funk",
     "R&B (Instrumental)",
     "R&B/Soul",
     "Reggae",
@@ -190,29 +215,6 @@ ALLOWED_GENRES = [
     "World",
     "Zydeco",
 ]
-
-# LIB1 is my primary music library
-LIB1_MEDIA_PATH = "/data/Music/"
-LIB1_EXPECTED_MEDIA_COUNT = 13547
-LIB1_EXPECTED_LRC_COUNT = 5802
-# Goal: Keep LIB1 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
-LIB1_TOTAL_FILESIZE_LIMIT_GB = 96
-
-# LIB2 is for everything that doesn't fit in LIB1
-# LIB2 is for all the music that isn't suitable for parties
-# LIB2 genres: classical music, classic country, soundtracks
-LIB2_MEDIA_PATH = "/data/MusicOther/"
-LIB2_EXPECTED_MEDIA_COUNT = 2278
-LIB2_EXPECTED_LRC_COUNT = 683
-# Goal: Keep LIB2 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
-LIB2_TOTAL_FILESIZE_LIMIT_GB = 96
-
-# intentionally lowercase for consistency, ".JPG" not allowed, etc.
-EXTS_MEDIA = ["mp3", "m4a"]
-EXTS_ART = ["jpg", "webp", "png"]
-EXTS_LYRICS = ["lrc", "txt"]
-EXTS_EXTRA = ["pdf"]
-ALLOWED_EXTS = EXTS_MEDIA + EXTS_ART + EXTS_LYRICS + EXTS_EXTRA
 
 
 @dataclass
