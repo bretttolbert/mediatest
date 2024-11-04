@@ -16,8 +16,9 @@ from dataclass_wizard import YAMLWizard  # type: ignore
 I run this script with pytest to keep my music folders organized.
 """
 
-MEGABYTE = 10**6
 KILOBYTE = 10**3
+MEGABYTE = 10**6
+GIGABYTE = 10**9
 PRESENT_YEAR: int = datetime.now().year
 
 # For running tests on the yaml file output by mediascan
@@ -26,21 +27,22 @@ PRESENT_YEAR: int = datetime.now().year
 MEDIASCAN_FILES_PATH = "../mediascan/files.yaml"
 MINIMUM_FILESIZE = 10 * KILOBYTE
 
-# LIB1 is my primary music library
+# LIB1 is my primary music library - party mix: rock/pop/hip-hop
 LIB1_MEDIA_PATH = "/data/Music/"
-LIB1_EXPECTED_MEDIA_COUNT = 13363
-LIB1_EXPECTED_LRC_COUNT = 5750
+LIB1_EXPECTED_MEDIA_COUNT = 13099
+LIB1_EXPECTED_LRC_COUNT = 5607
 # Goal: Keep LIB1 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
-LIB1_TOTAL_FILESIZE_LIMIT_GB = 96
+LIB1_TOTAL_FILESIZE_LIMIT_GB = 100
 
 # LIB2 is for everything that doesn't fit in LIB1
 # LIB2 is for all the music that isn't suitable for parties
-# LIB2 genres: classical music, classic country, soundtracks
+# LIB2 genres: classical music, classic country, soundtracks, doom metal,
+# the smiths, the cure, anything too whiny or melancholic
 LIB2_MEDIA_PATH = "/data/MusicOther/"
-LIB2_EXPECTED_MEDIA_COUNT = 2636
-LIB2_EXPECTED_LRC_COUNT = 735
+LIB2_EXPECTED_MEDIA_COUNT = 3194
+LIB2_EXPECTED_LRC_COUNT = 878
 # Goal: Keep LIB2 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
-LIB2_TOTAL_FILESIZE_LIMIT_GB = 96
+LIB2_TOTAL_FILESIZE_LIMIT_GB = 100
 
 # intentionally lowercase for consistency, ".JPG" not allowed, etc.
 EXTS_MEDIA = ["mp3", "m4a"]
@@ -497,7 +499,7 @@ def test_lib_total_filesize_limit(media_path: str, limit: int):
             fp = os.path.join(path, f)
             size += os.stat(fp).st_size
     print(size)
-    size_gb = size / 1024**3
+    size_gb = size / GIGABYTE
     print("size_gb=", size_gb)
     assert size_gb < limit
 
