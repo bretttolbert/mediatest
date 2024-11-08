@@ -8,7 +8,7 @@ import sys
 from typing import List
 
 from dataclasses import dataclass
-from datetime import datetime, time
+from datetime import datetime
 
 from dataclass_wizard import YAMLWizard  # type: ignore
 
@@ -29,7 +29,7 @@ MINIMUM_FILESIZE = 10 * KILOBYTE
 
 # LIB1 is my primary music library - party mix: rock/pop/hip-hop
 LIB1_MEDIA_PATH = "/data/Music/"
-LIB1_EXPECTED_MEDIA_COUNT = 13099
+LIB1_EXPECTED_MEDIA_COUNT = 13130
 LIB1_EXPECTED_LRC_COUNT = 5607
 # Goal: Keep LIB1 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
 LIB1_TOTAL_FILESIZE_LIMIT_GB = 100
@@ -39,7 +39,7 @@ LIB1_TOTAL_FILESIZE_LIMIT_GB = 100
 # LIB2 genres: classical music, classic country, soundtracks, doom metal,
 # the smiths, the cure, anything too whiny or melancholic
 LIB2_MEDIA_PATH = "/data/MusicOther/"
-LIB2_EXPECTED_MEDIA_COUNT = 3194
+LIB2_EXPECTED_MEDIA_COUNT = 3204
 LIB2_EXPECTED_LRC_COUNT = 878
 # Goal: Keep LIB2 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
 LIB2_TOTAL_FILESIZE_LIMIT_GB = 100
@@ -229,9 +229,9 @@ class Mediafile:
     path: str
     size: int
     format: str
-    title: str | int | float | bool
-    artist: str | bool | int
-    album: str | int | float | bool | time
+    title: str
+    artist: str
+    album: str
     genre: str
     year: int
     duration: int
