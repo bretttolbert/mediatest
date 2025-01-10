@@ -29,8 +29,8 @@ MINIMUM_FILESIZE = 10 * KILOBYTE
 
 # LIB1 is my primary music library - party mix: rock/pop/hip-hop
 LIB1_MEDIA_PATH = "/data/Music/"
-LIB1_EXPECTED_MEDIA_COUNT = 13130
-LIB1_EXPECTED_LRC_COUNT = 5529
+LIB1_EXPECTED_MEDIA_COUNT = 13074
+LIB1_EXPECTED_LRC_COUNT = 5243
 # Goal: Keep LIB1 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
 LIB1_TOTAL_FILESIZE_LIMIT_GB = 100
 
@@ -39,8 +39,8 @@ LIB1_TOTAL_FILESIZE_LIMIT_GB = 100
 # LIB2 genres: classical music, classic country, soundtracks, doom metal,
 # the smiths, the cure, anything too whiny or melancholic
 LIB2_MEDIA_PATH = "/data/MusicOther/"
-LIB2_EXPECTED_MEDIA_COUNT = 3569
-LIB2_EXPECTED_LRC_COUNT = 951
+LIB2_EXPECTED_MEDIA_COUNT = 4404
+LIB2_EXPECTED_LRC_COUNT = 1234
 # Goal: Keep LIB2 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
 LIB2_TOTAL_FILESIZE_LIMIT_GB = 100
 
@@ -50,6 +50,51 @@ EXTS_ART = ["jpg", "webp", "png"]
 EXTS_LYRICS = ["lrc", "txt"]
 EXTS_EXTRA = ["pdf"]
 ALLOWED_EXTS = EXTS_MEDIA + EXTS_ART + EXTS_LYRICS + EXTS_EXTRA
+
+LIB1_DISALLOWED_GENRES = [
+    "Alternative Metal",
+    "Ambient",
+    "Electronic (Instrumental)",
+    "Experimental",
+    "Experimental Ambient Rock",
+    "Blues",
+    "Big Band",
+    "Black Metal",
+    "Bluegrass",
+    "Bollywood",
+    "Bossa Nova",
+    "Britpop",
+    "Chinese",
+    "Cajun",
+    "Celtic",
+    "Classical",
+    "Comedy",
+    "Country",
+    "Classic Country",
+    "Dirty Blues",
+    "Dixieland Jazz",
+    "Doom Metal",
+    "Doo-wop",
+    "Drumline",
+    "Folk",
+    "Folk rock, Jazz",
+    "Gospel",
+    "Grindcore",
+    "Honky Tonk",
+    "New Wave français",
+    "Nu Metal français",
+    "Political",
+    "Post-Grunge",
+    "Post-Industrial",
+    "Russian Folk",
+    "Soundtrack",
+    "Swing",
+    "Volksmusik",
+    "Zydeco",
+]
+
+LIB2_DISALLOWED_GENRES = []
+
 
 ALLOWED_GENRES = [
     "Acid Punk",
@@ -128,7 +173,6 @@ ALLOWED_GENRES = [
     "Hip-Hop/Reggae",
     "Honky Tonk",
     "House",
-    "Indie",
     "Indie Folk",
     "Indie Pop",
     "Indie Rock",
@@ -527,6 +571,18 @@ def test_yaml_size_gt_min(file: Mediafile):
 @pytest.mark.parametrize("file", files.mediafiles)
 def test_yaml_allowed_genres(file: Mediafile):
     assert file.genre in ALLOWED_GENRES, f"{file.path}"
+
+
+@pytest.mark.parametrize("file", files.mediafiles)
+def test_yaml_disallowed_genres(file: Mediafile):
+    if file.path.find(LIB1_MEDIA_PATH) != -1:
+        assert (
+            file.genre not in LIB1_DISALLOWED_GENRES
+        ), f"{file.path} (genre: {file.genre}) is prohibited by LIB1_DISALLOWED_GENRES"
+    elif file.path.find(LIB2_MEDIA_PATH) != -1:
+        assert (
+            file.genre not in LIB2_DISALLOWED_GENRES
+        ), f"{file.path} (genre: {file.genre}) is prohibited by LIB2_DISALLOWED_GENRES"
 
 
 # end mediascan yaml tests
