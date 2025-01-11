@@ -5,7 +5,7 @@ import pytest
 import os
 import re
 import sys
-from typing import List
+from typing import Dict, List
 
 from dataclasses import dataclass
 from datetime import datetime
@@ -29,8 +29,8 @@ MINIMUM_FILESIZE = 10 * KILOBYTE
 
 # LIB1 is my primary music library - party mix: rock/pop/hip-hop
 LIB1_MEDIA_PATH = "/data/Music/"
-LIB1_EXPECTED_MEDIA_COUNT = 13074
-LIB1_EXPECTED_LRC_COUNT = 5243
+LIB1_EXPECTED_MEDIA_COUNT = 13081
+LIB1_EXPECTED_LRC_COUNT = 5242
 # Goal: Keep LIB1 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
 LIB1_TOTAL_FILESIZE_LIMIT_GB = 100
 
@@ -39,8 +39,8 @@ LIB1_TOTAL_FILESIZE_LIMIT_GB = 100
 # LIB2 genres: classical music, classic country, soundtracks, doom metal,
 # the smiths, the cure, anything too whiny or melancholic
 LIB2_MEDIA_PATH = "/data/MusicOther/"
-LIB2_EXPECTED_MEDIA_COUNT = 4404
-LIB2_EXPECTED_LRC_COUNT = 1234
+LIB2_EXPECTED_MEDIA_COUNT = 4415
+LIB2_EXPECTED_LRC_COUNT = 1235
 # Goal: Keep LIB2 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
 LIB2_TOTAL_FILESIZE_LIMIT_GB = 100
 
@@ -275,6 +275,7 @@ class Mediafile:
     format: str
     title: str
     artist: str
+    albumartist: str
     album: str
     genre: str
     year: int
@@ -583,6 +584,30 @@ def test_yaml_disallowed_genres(file: Mediafile):
         assert (
             file.genre not in LIB2_DISALLOWED_GENRES
         ), f"{file.path} (genre: {file.genre}) is prohibited by LIB2_DISALLOWED_GENRES"
+
+
+@pytest.mark.parametrize("file", files.mediafiles)
+def test_yaml_artist_is_not_empty(file: Mediafile):
+    assert len(file.artist) > 0, f"{file.path}"
+
+
+@pytest.mark.parametrize("file", files.mediafiles)
+def test_yaml_albumartist_is_not_empty(file: Mediafile):
+    assert len(file.albumartist) > 0, f"{file.path}"
+
+
+def test_yaml_albumartist_same_for_every_track_in_every_album():
+    """
+    Different tracks may have different artists e.g. "Dr. Dre feat. Snoop Dog"
+    but all tracks in a an albums should have the same albumartist e.g. "Dr. Dre"
+    """
+    albums: Dict[str, str] = {}
+    for file in files.mediafiles:
+        albumkey = f"{file.albumartist} - {file.album} [{file.year}]"
+        if albumkey in albums:
+            assert albums[albumkey] == file.albumartist
+        else:
+            albums[albumkey] = file.albumartist
 
 
 # end mediascan yaml tests
