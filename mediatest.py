@@ -29,18 +29,18 @@ MINIMUM_FILESIZE = 10 * KILOBYTE
 
 # LIB1 is my primary music library - party mix: rock/pop/hip-hop
 LIB1_MEDIA_PATH = "/data/Music/"
-LIB1_EXPECTED_MEDIA_COUNT = 13081
-LIB1_EXPECTED_LRC_COUNT = 5242
+LIB1_EXPECTED_MEDIA_COUNT = 12991
+LIB1_EXPECTED_LRC_COUNT = 5162
 # Goal: Keep LIB1 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
 LIB1_TOTAL_FILESIZE_LIMIT_GB = 100
 
 # LIB2 is for everything that doesn't fit in LIB1
 # LIB2 is for all the music that isn't suitable for parties
-# LIB2 genres: classical music, classic country, soundtracks, doom metal,
+# LIB2 genres: classical music, classic country, soundtracks, doom metal, folk punk,
 # the smiths, the cure, anything too whiny or melancholic
 LIB2_MEDIA_PATH = "/data/MusicOther/"
-LIB2_EXPECTED_MEDIA_COUNT = 4415
-LIB2_EXPECTED_LRC_COUNT = 1235
+LIB2_EXPECTED_MEDIA_COUNT = 4651
+LIB2_EXPECTED_LRC_COUNT = 1314
 # Goal: Keep LIB2 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
 LIB2_TOTAL_FILESIZE_LIMIT_GB = 100
 
@@ -67,6 +67,7 @@ LIB1_DISALLOWED_GENRES = [
     "Chinese",
     "Cajun",
     "Celtic",
+    "Celtic Rock",
     "Classical",
     "Comedy",
     "Country",
@@ -77,10 +78,12 @@ LIB1_DISALLOWED_GENRES = [
     "Doo-wop",
     "Drumline",
     "Folk",
+    "Folk Punk",
     "Folk rock, Jazz",
     "Gospel",
     "Grindcore",
     "Honky Tonk",
+    "Indie Folk",
     "New Wave français",
     "Nu Metal français",
     "Political",
