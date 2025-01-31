@@ -29,7 +29,7 @@ MINIMUM_FILESIZE = 10 * KILOBYTE
 
 # LIB1 is my primary music library - party mix: rock/pop/hip-hop/r&b/disco
 LIB1_MEDIA_PATH = "/data/Music/"
-LIB1_EXPECTED_MEDIA_COUNT = 12946
+LIB1_EXPECTED_MEDIA_COUNT = 12981
 LIB1_EXPECTED_LRC_COUNT = 5064
 # Goal: Keep LIB1 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
 LIB1_TOTAL_FILESIZE_LIMIT_GB = 100
@@ -38,7 +38,7 @@ LIB1_TOTAL_FILESIZE_LIMIT_GB = 100
 # LIB2 genres: jazz, classical music, classic country, soundtracks, doom metal, folk punk,
 # the smiths, the cure, emo music, nu metal, stoner rock
 LIB2_MEDIA_PATH = "/data/MusicOther/"
-LIB2_EXPECTED_MEDIA_COUNT = 4922
+LIB2_EXPECTED_MEDIA_COUNT = 4934
 LIB2_EXPECTED_LRC_COUNT = 1412
 # Goal: Keep LIB2 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
 LIB2_TOTAL_FILESIZE_LIMIT_GB = 100
