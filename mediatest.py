@@ -27,20 +27,19 @@ PRESENT_YEAR: int = datetime.now().year
 MEDIASCAN_FILES_PATH = "../mediascan/files.yaml"
 MINIMUM_FILESIZE = 10 * KILOBYTE
 
-# LIB1 is my primary music library - party mix: rock/pop/hip-hop
+# LIB1 is my primary music library - party mix: rock/pop/hip-hop/r&b/disco
 LIB1_MEDIA_PATH = "/data/Music/"
-LIB1_EXPECTED_MEDIA_COUNT = 12991
-LIB1_EXPECTED_LRC_COUNT = 5162
+LIB1_EXPECTED_MEDIA_COUNT = 12946
+LIB1_EXPECTED_LRC_COUNT = 5064
 # Goal: Keep LIB1 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
 LIB1_TOTAL_FILESIZE_LIMIT_GB = 100
 
 # LIB2 is for everything that doesn't fit in LIB1
-# LIB2 is for all the music that isn't suitable for parties
-# LIB2 genres: classical music, classic country, soundtracks, doom metal, folk punk,
-# the smiths, the cure, anything too whiny or melancholic
+# LIB2 genres: jazz, classical music, classic country, soundtracks, doom metal, folk punk,
+# the smiths, the cure, emo music, nu metal, stoner rock
 LIB2_MEDIA_PATH = "/data/MusicOther/"
-LIB2_EXPECTED_MEDIA_COUNT = 4651
-LIB2_EXPECTED_LRC_COUNT = 1314
+LIB2_EXPECTED_MEDIA_COUNT = 4922
+LIB2_EXPECTED_LRC_COUNT = 1412
 # Goal: Keep LIB2 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
 LIB2_TOTAL_FILESIZE_LIMIT_GB = 100
 
@@ -77,6 +76,7 @@ LIB1_DISALLOWED_GENRES = [
     "Doom Metal",
     "Doo-wop",
     "Drumline",
+    "Emo / Pop-Rock",
     "Folk",
     "Folk Punk",
     "Folk rock, Jazz",
@@ -91,6 +91,7 @@ LIB1_DISALLOWED_GENRES = [
     "Post-Industrial",
     "Russian Folk",
     "Soundtrack",
+    "Stoner Rock",
     "Swing",
     "Volksmusik",
     "Zydeco",
