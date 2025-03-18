@@ -29,17 +29,17 @@ MINIMUM_FILESIZE = 10 * KILOBYTE
 
 # LIB1 is my primary music library - party mix: rock/pop/hip-hop/r&b/disco
 LIB1_MEDIA_PATH = "/data/Music/"
-LIB1_EXPECTED_MEDIA_COUNT = 12981
-LIB1_EXPECTED_LRC_COUNT = 5064
+LIB1_EXPECTED_MEDIA_COUNT = 12819
+LIB1_EXPECTED_LRC_COUNT = 4958
 # Goal: Keep LIB1 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
 LIB1_TOTAL_FILESIZE_LIMIT_GB = 100
 
 # LIB2 is for everything that doesn't fit in LIB1
 # LIB2 genres: jazz, classical music, classic country, soundtracks, doom metal, folk punk,
-# the smiths, the cure, emo music, nu metal, stoner rock
+# the smiths, the cure, emo music, stoner rock, slow rock
 LIB2_MEDIA_PATH = "/data/MusicOther/"
-LIB2_EXPECTED_MEDIA_COUNT = 4934
-LIB2_EXPECTED_LRC_COUNT = 1412
+LIB2_EXPECTED_MEDIA_COUNT = 5688
+LIB2_EXPECTED_LRC_COUNT = 1517
 # Goal: Keep LIB2 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
 LIB2_TOTAL_FILESIZE_LIMIT_GB = 100
 
@@ -53,6 +53,8 @@ ALLOWED_EXTS = EXTS_MEDIA + EXTS_ART + EXTS_LYRICS + EXTS_EXTRA
 LIB1_DISALLOWED_GENRES = [
     "Alternative Metal",
     "Ambient",
+    "Art Rock",
+    "Easy Listening",
     "Electronic (Instrumental)",
     "Experimental",
     "Experimental Ambient Rock",
@@ -84,13 +86,19 @@ LIB1_DISALLOWED_GENRES = [
     "Grindcore",
     "Honky Tonk",
     "Indie Folk",
+    "Jazz",
     "New Wave français",
+    "Noise Rock",
     "Nu Metal français",
     "Political",
     "Post-Grunge",
     "Post-Industrial",
+    "Post-Rock",
+    "Progressive Pop",
     "Russian Folk",
+    "Soft Rock",
     "Soundtrack",
+    "Southern Rock",
     "Stoner Rock",
     "Swing",
     "Volksmusik",
@@ -199,6 +207,7 @@ ALLOWED_GENRES = [
     "New Disco",
     "New Wave",
     "New Wave français",
+    "Noise Rock",
     "Norteño",
     "Nu Jazz",
     "Nu Jazz (Instrumental)",
@@ -245,6 +254,7 @@ ALLOWED_GENRES = [
     "Russian Pop",
     "Shoegaze",
     "Ska Punk",
+    "Sludge Metal",
     "Soft Rock",
     "Sophisti-pop",
     "Soundtrack",
