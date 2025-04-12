@@ -5,12 +5,14 @@ import pytest
 import os
 import re
 import sys
-from typing import Dict, List
+from typing import Dict, List, Set
 
 from dataclasses import dataclass
 from datetime import datetime
 
 from dataclass_wizard import YAMLWizard  # type: ignore
+
+from mediatest.genres import Genre
 
 """
 I run this script with pytest to keep my music folders organized.
@@ -26,254 +28,205 @@ PRESENT_YEAR: int = datetime.now().year
 # E.g. testing if year is a valid year or something weird like 0
 MEDIASCAN_FILES_PATH = "../mediascan/files.yaml"
 MINIMUM_FILESIZE = 10 * KILOBYTE
-
-# LIB1 is my primary music library - party mix: rock/pop/hip-hop/r&b/disco
-LIB1_MEDIA_PATH = "/data/Music/"
-LIB1_EXPECTED_MEDIA_COUNT = 12819
-LIB1_EXPECTED_LRC_COUNT = 4958
-# Goal: Keep LIB1 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
-LIB1_TOTAL_FILESIZE_LIMIT_GB = 100
-
-# LIB2 is for everything that doesn't fit in LIB1
-# LIB2 genres: jazz, classical music, classic country, soundtracks, doom metal, folk punk,
-# the smiths, the cure, emo music, stoner rock, slow rock
-LIB2_MEDIA_PATH = "/data/MusicOther/"
-LIB2_EXPECTED_MEDIA_COUNT = 5688
-LIB2_EXPECTED_LRC_COUNT = 1517
-# Goal: Keep LIB2 small enough to fit on 128 GB tablets or 100 GB (triple-layer) blu-rays
-LIB2_TOTAL_FILESIZE_LIMIT_GB = 100
-
-# intentionally lowercase for consistency, ".JPG" not allowed, etc.
 EXTS_MEDIA = ["mp3", "m4a"]
-EXTS_ART = ["jpg", "webp", "png"]
+EXTS_ART = [
+    "jpg",
+    "webp",
+    "png",
+]  # intentionally lowercase for consistency, ".JPG" not allowed, etc.
 EXTS_LYRICS = ["lrc", "txt"]
-EXTS_EXTRA = ["pdf"]
+EXTS_EXTRA = ["pdf"]  # some albums include pdf booklets
 ALLOWED_EXTS = EXTS_MEDIA + EXTS_ART + EXTS_LYRICS + EXTS_EXTRA
+LIB_GENRES_MODE_BLACKLIST = False  # Set to True if you want LIBS_GENRES lists to be blacklists instead of whitelists (default)
 
-LIB1_DISALLOWED_GENRES = [
-    "Alternative Metal",
-    "Ambient",
-    "Art Rock",
-    "Easy Listening",
-    "Electronic (Instrumental)",
-    "Experimental",
-    "Experimental Ambient Rock",
-    "Blues",
-    "Big Band",
-    "Black Metal",
-    "Bluegrass",
-    "Bollywood",
-    "Bossa Nova",
-    "Britpop",
-    "Chinese",
-    "Cajun",
-    "Celtic",
-    "Celtic Rock",
-    "Classical",
-    "Comedy",
-    "Country",
-    "Classic Country",
-    "Dirty Blues",
-    "Dixieland Jazz",
-    "Doom Metal",
-    "Doo-wop",
-    "Drumline",
-    "Emo / Pop-Rock",
-    "Folk",
-    "Folk Punk",
-    "Folk rock, Jazz",
-    "Gospel",
-    "Grindcore",
-    "Honky Tonk",
-    "Indie Folk",
-    "Jazz",
-    "New Wave français",
-    "Noise Rock",
-    "Nu Metal français",
-    "Political",
-    "Post-Grunge",
-    "Post-Industrial",
-    "Post-Rock",
-    "Progressive Pop",
-    "Russian Folk",
-    "Soft Rock",
-    "Soundtrack",
-    "Southern Rock",
-    "Stoner Rock",
-    "Swing",
-    "Volksmusik",
-    "Zydeco",
-]
-
-LIB2_DISALLOWED_GENRES = []
-
-
-ALLOWED_GENRES = [
-    "Acid Punk",
-    "Acid Rock",
-    "Afrobeat",
-    "Afropop",
-    "Alternative",
-    "Alternative Metal",
-    "Alternative Rock",
-    "Ambient",
-    "Art Rock",
-    "Art Punk",
-    "Big Band",
-    "Black Metal",
-    "Bluegrass",
-    "Blues",
-    "Bollywood",
-    "Bossa Nova",
-    "Britpop",
-    "Cajun",
-    "Celtic",
-    "Celtic Rock",
-    "Chillwave",
-    "Chinese",
-    "Classic Country",
-    "Classic Pop",
-    "Classic Prog",
-    "Classic Rock",
-    "Classical",
-    "Comedy",
-    "Country",
-    "Cumbia",
-    "Dabke",
-    "Dance/Electronic",
-    "Death Metal",
-    "Deep House",
-    "Dirty Blues",
-    "Disco",
-    "Dixieland Jazz",
-    "Doo-wop",
-    "Doom Metal",
-    "Downtempo",
-    "Dream Pop",
-    "Drumline",
-    "Easy Listening",
-    "Electronic",
-    "Electronic (Instrumental)",
-    "Electronica",
-    "Electropop",
-    "Emo / Pop-Rock",
-    "Eurodance",
-    "Experimental",
-    "Experimental Ambient Rock",
-    "Folk",
-    "Folk Pop",
-    "Folk Punk",
-    "Folk Rock",
-    "Folk rock, Jazz",
-    "French House",
-    "Funk",
-    "Funk (Instrumental)",
-    "Funk Metal",
-    "Funk Rock",
-    "Funk/Soul",
-    "Funktronica",
-    "Glam Rock",
-    "Gospel",
-    "Goth Rock",
-    "Gothic Rock",
-    "Grindcore",
-    "Grunge",
-    "Heavy Metal",
-    "Hip-Hop",
-    "Hip-Hop français",
-    "Hip-Hop/Electronic",
-    "Hip-Hop/Reggae",
-    "Honky Tonk",
-    "House",
-    "Indie Folk",
-    "Indie Pop",
-    "Indie Rock",
-    "Industrial",
-    "Industrial Metal",
-    "Japanese Rock",
-    "Jazz",
-    "Jazz Rock",
-    "Jazz/Funk",
-    "K-Pop",
-    "Korean Rock",
-    "Latin",
-    "Latin Pop",
-    "Literature",
-    "Metal",
-    "Metalcore",
-    "Motown",
-    "Neo-Soul",
-    "New Age",
-    "New Disco",
-    "New Wave",
-    "New Wave français",
-    "Noise Rock",
-    "Norteño",
-    "Nu Jazz",
-    "Nu Jazz (Instrumental)",
-    "Nu Metal",
-    "Nu Metal français",
-    "Political",
-    "Pop",
-    "Pop Punk",
-    "Pop Rock",
-    "Pop française",
-    "Pop italiano",
-    "Pop-Punk",
-    "Post-Black Metal",
-    "Post-Grunge",
-    "Post-Hardcore",
-    "Post-Industrial",
-    "Post-Metal",
-    "Post-Punk",
-    "Post-Rock",
-    "Power Pop",
-    "Prog Rock",
-    "Progressive Metal",
-    "Progressive Pop",
-    "Psychedelic Folk",
-    "Psychedelic Pop",
-    "Psychedelic Rock",
-    "Punk",
-    "Punk Rock",
-    "Punk français",
-    "R&B",
-    "R&B/Funk",
-    "R&B (Instrumental)",
-    "R&B/Soul",
-    "Reggae",
-    "Reggae Rock",
-    "RnB français",
-    "Rock",
-    "Rock en español",
-    "Rock brasileiro",
-    "Rock français",
-    "Rock italiano",
-    "Rockabilly",
-    "Russian Folk",
-    "Russian Pop",
-    "Shoegaze",
-    "Ska Punk",
-    "Sludge Metal",
-    "Soft Rock",
-    "Sophisti-pop",
-    "Soundtrack",
-    "Southern Punk Rock",
-    "Southern Rock",
-    "Stoner Rock",
-    "Surf Punk",
-    "Surf Rock",
-    "Swing",
-    "Synth-pop",
-    "Techno",
-    "Thrash Metal",
-    "Traditional Pop",
-    "Trip hop",
-    "Ukrainian Pop",
-    "Urbano",
-    "Volksmusik",
-    "World",
-    "Zydeco",
+# Multiple music libraries are supported.
+# For my personal use, I bifurcate my music into two libraries.
+# One reason for this is because I backup my libraries to Blu-Ray M-discs for
+# long-term cold-storage and triple-layer Blu-Rays have a max capacity of 100 GB.
+# The other reason I do this is I have some Android tablets with a maximum storage
+# capacity of 128 GB and I sync my primary library (LIB1) to it, for a party shuffle mix.
+# Consequently LIB2 is primarily for non-party music.
+# I bifurcate my music library based on genre tags.
+# Certain genres exclusively belong in LIB1, and other genres exclusively belong in LIB2.
+# I use pytest to enforce this constraint.
+# The essential dichotomy is popular/upbeat genres vs. more obscure/melancholic genres
+# LIB1 (/data/Music) is my primary music library - party mix: rock/pop/hip-hop/r&b/disco
+# LIB2 (/data/MusicOther) is for everything that doesn't fit in LIB1: alternative/jazz/metal
+# Variables beginning with LIBS_ are arrays of size LIB_COUNT
+LIB_COUNT = 2
+LIBS_MEDIA_PATH = ["/data/Music/", "/data/MusicOther/"]
+LIBS_EXPECTED_MEDIA_COUNT = [10450, 8723]
+LIBS_EXPECTED_LRC_COUNT = [6229, 2969]
+LIBS_TOTAL_FILESIZE_LIMIT_GB = [100, 100]
+LIBS_EXPECTED_FILESIZE_GB = [79, 68]
+LIBS_GENRES: List[List[Genre]] = [
+    [
+        Genre.Afrobeat,
+        Genre.Afropop,
+        Genre.ArtPunk,
+        Genre.ClassicPop,
+        Genre.ClassicRock,
+        Genre.Cumbia,
+        Genre.Dabke,
+        Genre.DanceElectronic,
+        Genre.DeepHouse,
+        Genre.Disco,
+        Genre.Downtempo,
+        Genre.DreamPop,
+        Genre.Electropop,
+        Genre.Eurodance,
+        Genre.FolkPop,
+        Genre.FrenchHouse,
+        Genre.Funk,
+        Genre.FunkMetal,
+        Genre.FunkRock,
+        Genre.FunkSoul,
+        Genre.Funktronica,
+        Genre.GlamRock,
+        Genre.Grunge,
+        Genre.HeavyMetal,
+        Genre.HipHop,
+        Genre.HipHopFrançais,
+        Genre.HipHopReggae,
+        Genre.House,
+        Genre.IndiePop,
+        Genre.IndieRock,
+        Genre.JapaneseRock,
+        Genre.KPop,
+        Genre.KoreanRock,
+        Genre.Latin,
+        Genre.LatinPop,
+        Genre.Motown,
+        Genre.NeoSoul,
+        Genre.NewAge,
+        Genre.NewDisco,
+        Genre.NewWave,
+        Genre.Norteño,
+        Genre.NuMetal,
+        Genre.Pop,
+        Genre.PopFrançaise,
+        Genre.PopItaliano,
+        Genre.PostPunk,
+        Genre.PopRock,
+        Genre.PostBlackMetal,
+        Genre.PostHardcore,
+        Genre.PostMetal,
+        Genre.PowerPop,
+        Genre.ProgressiveMetal,
+        Genre.ProgRock,
+        Genre.PsychedelicFolk,
+        Genre.PsychedelicPop,
+        Genre.PsychedelicRock,
+        Genre.Punk,
+        Genre.PunkFrançais,
+        Genre.PunkRock,
+        Genre.RnB,
+        Genre.RnBFunk,
+        Genre.RnBSoul,
+        Genre.Reggaeton,
+        Genre.ReggaeRock,
+        Genre.RnBFrançais,
+        Genre.Rockabilly,
+        Genre.RockBrasileiro,
+        Genre.RockEnEspañol,
+        Genre.RockFrançais,
+        Genre.RockItaliano,
+        Genre.RussianPop,
+        Genre.SkaPunk,
+        Genre.SludgeMetal,
+        Genre.SophistiPop,
+        Genre.SouthernPunkRock,
+        Genre.SurfRock,
+        Genre.SurfPunk,
+        Genre.SynthPop,
+        Genre.Techno,
+        Genre.ThrashMetal,
+        Genre.TraditionalPop,
+        Genre.TripHop,
+        Genre.UkrainianPop,
+        Genre.Urbano,
+        Genre.World,
+    ],
+    [
+        Genre.AcidPunk,
+        Genre.AcidRock,
+        Genre.Alternative,
+        Genre.AlternativeRock,
+        Genre.AlternativeMetal,
+        Genre.Ambient,
+        Genre.ArtRock,
+        Genre.EasyListening,
+        Genre.Electronic,
+        Genre.Electronica,
+        Genre.ElectronicInstrumental,
+        Genre.Experimental,
+        Genre.ExperimentalAmbientRock,
+        Genre.Blues,
+        Genre.BigBand,
+        Genre.BlackMetal,
+        Genre.Bluegrass,
+        Genre.Bollywood,
+        Genre.BossaNova,
+        Genre.Britpop,
+        Genre.Chillwave,
+        Genre.Chinese,
+        Genre.Cajun,
+        Genre.Celtic,
+        Genre.CelticRock,
+        Genre.Classical,
+        Genre.ClassicProg,
+        Genre.Comedy,
+        Genre.Country,
+        Genre.ClassicCountry,
+        Genre.DeathMetal,
+        Genre.DirtyBlues,
+        Genre.DixielandJazz,
+        Genre.DoomMetal,
+        Genre.DooWop,
+        Genre.Drumline,
+        Genre.EmoPopRock,
+        Genre.Folk,
+        Genre.FolkPunk,
+        Genre.FolkRockJazz,
+        Genre.FunkInstrumental,
+        Genre.Gospel,
+        Genre.Grindcore,
+        Genre.GothRock,
+        Genre.HipHopElectronic,
+        Genre.HipHopInstrumental,
+        Genre.HonkyTonk,
+        Genre.IndieFolk,
+        Genre.Industrial,
+        Genre.IndustrialMetal,
+        Genre.Jazz,
+        Genre.JazzFunk,
+        Genre.JazzRock,
+        Genre.Literature,
+        Genre.Metalcore,
+        Genre.NewWaveFrançais,
+        Genre.NoiseRock,
+        Genre.NuJazz,
+        Genre.NuJazzInstrumental,
+        Genre.NuMetalFrançais,
+        Genre.Political,
+        Genre.PostGrunge,
+        Genre.PostIndustrial,
+        Genre.PostRock,
+        Genre.PostPunk,
+        Genre.ProgressivePop,
+        Genre.ProtoPunk,
+        Genre.Reggae,
+        Genre.RussianFolk,
+        Genre.Shoegaze,
+        Genre.SpeechSample,
+        Genre.SoftRock,
+        Genre.Soundtrack,
+        Genre.SouthernRock,
+        Genre.StonerRock,
+        Genre.Swing,
+        Genre.Volksmusik,
+        Genre.Zydeco,
+    ],
 ]
 
 
@@ -297,7 +250,7 @@ class Mediafile:
 
 
 @dataclass
-class Data(YAMLWizard):
+class Data(YAMLWizard):  # type: ignore
     """
     Data dataclass
 
@@ -508,50 +461,36 @@ def do_test_album_cover_jpg(media_path: str):
 # begin filesystem tests
 
 
-@pytest.mark.parametrize("media_path", [LIB1_MEDIA_PATH, LIB2_MEDIA_PATH])
+@pytest.mark.parametrize("media_path", LIBS_MEDIA_PATH)
 def test_allowed_exts(media_path: str):
     do_test_allowed_exts(media_path)
 
 
-@pytest.mark.parametrize(
-    "media_path,expected_media_count,expected_lrc_count",
-    [
-        (LIB1_MEDIA_PATH, LIB1_EXPECTED_MEDIA_COUNT, LIB1_EXPECTED_LRC_COUNT),
-        (LIB2_MEDIA_PATH, LIB2_EXPECTED_MEDIA_COUNT, LIB2_EXPECTED_LRC_COUNT),
-    ],
-)
-def test_media_file_count(
-    media_path: str, expected_media_count: int, expected_lrc_count: int
-):
-    do_test_media_file_count(media_path, expected_media_count, expected_lrc_count)
+@pytest.mark.parametrize("lib_idx", list(range(LIB_COUNT)))
+def test_media_file_count(lib_idx: int):
+    do_test_media_file_count(
+        LIBS_MEDIA_PATH[lib_idx],
+        LIBS_EXPECTED_MEDIA_COUNT[lib_idx],
+        LIBS_EXPECTED_LRC_COUNT[lib_idx],
+    )
 
 
-@pytest.mark.parametrize("media_path", [LIB1_MEDIA_PATH, LIB2_MEDIA_PATH])
+@pytest.mark.parametrize("media_path", LIBS_MEDIA_PATH)
 def test_no_empty_dirs(media_path: str):
     do_test_allowed_exts(media_path)
 
 
-@pytest.mark.parametrize("media_path", [LIB1_MEDIA_PATH, LIB2_MEDIA_PATH])
+@pytest.mark.parametrize("media_path", LIBS_MEDIA_PATH)
 def test_album_dir_name(media_path: str):
     do_test_album_dir_name(media_path)
 
 
-@pytest.mark.parametrize("media_path", [LIB1_MEDIA_PATH, LIB2_MEDIA_PATH])
+@pytest.mark.parametrize("media_path", LIBS_MEDIA_PATH)
 def test_album_cover_jpg(media_path: str):
     do_test_album_cover_jpg(media_path)
 
 
-@pytest.mark.parametrize(
-    "media_path,limit",
-    [
-        (LIB1_MEDIA_PATH, LIB1_TOTAL_FILESIZE_LIMIT_GB),
-        (LIB2_MEDIA_PATH, LIB2_TOTAL_FILESIZE_LIMIT_GB),
-    ],
-)
-def test_lib_total_filesize_limit(media_path: str, limit: int):
-    """Ensures that the total filesize of my LIB1 folder does not exceed
-    LIB1_TOTAL_FILESIZE_LIMIT_GB
-    """
+def get_lib_total_filesize_gb(media_path: str) -> float:
     size = 0
     for path, _, files in os.walk(media_path):
         for f in files:
@@ -560,7 +499,23 @@ def test_lib_total_filesize_limit(media_path: str, limit: int):
     print(size)
     size_gb = size / GIGABYTE
     print("size_gb=", size_gb)
-    assert size_gb < limit
+    return size_gb
+
+
+@pytest.mark.parametrize("lib_idx", list(range(LIB_COUNT)))
+def test_lib_total_filesize_limit(lib_idx: int):
+    """Ensures that the total filesize of LIB folder does not exceed LIBS_TOTAL_FILESIZE_LIMIT_GB"""
+    media_path = LIBS_MEDIA_PATH[lib_idx]
+    size_gb = get_lib_total_filesize_gb(media_path)
+    assert size_gb < LIBS_TOTAL_FILESIZE_LIMIT_GB[lib_idx]
+
+
+@pytest.mark.parametrize("lib_idx", list(range(LIB_COUNT)))
+def test_lib_expected_filesize(lib_idx: int):
+    """Ensures that the total filesize of LIB folder is equal to LIBS_EXPECTED_FILESIZE_GB"""
+    media_path = LIBS_MEDIA_PATH[lib_idx]
+    size_gb = get_lib_total_filesize_gb(media_path)
+    assert round(size_gb) == LIBS_EXPECTED_FILESIZE_GB[lib_idx]
 
 
 # end filesystem tests
@@ -583,21 +538,76 @@ def test_yaml_size_gt_min(file: Mediafile):
     assert file.size >= MINIMUM_FILESIZE, f"{file.path}"
 
 
+def get_all_genre_strings() -> List[str]:
+    return [g.value for g in Genre]
+
+
 @pytest.mark.parametrize("file", files.mediafiles)
 def test_yaml_allowed_genres(file: Mediafile):
-    assert file.genre in ALLOWED_GENRES, f"{file.path}"
+    assert file.genre in get_all_genre_strings(), f"{file.path}"
+
+
+@pytest.mark.parametrize("lib_idx", list(range(LIB_COUNT)))
+def test_lib_genres_no_dupes(lib_idx: int):
+    s: Set[str] = set()
+    for genre in LIBS_GENRES[lib_idx]:
+        if genre in s:
+            pytest.exit(f"Duplicate genre detected in LIB{lib_idx}_GENRES: {genre}")
+        s.add(genre)
+
+
+def test_lib_genres_no_intersections():
+    """TODO: Make this work for more than two libs"""
+    for idx in range(LIB_COUNT):
+        if idx == LIB_COUNT - 1:
+            return
+        intersection = set(LIBS_GENRES[idx]) & set(LIBS_GENRES[idx + 1])
+        if len(intersection):
+            pytest.exit(
+                f"Duplicate genres in both LIB{idx+1} and LIB{idx+2}: {str(intersection)}"
+            )
+
+
+def test_lib_genres_all_genres_used():
+    for genre in get_all_genre_strings():
+        found = False
+        for i in range(LIB_COUNT):
+            if genre in LIBS_GENRES[i]:
+                found = True
+                break
+        if not found:
+            pytest.exit("Genre not in any lib genres: " + genre)
+
+
+def genre_string_to_enum(s: str):
+    try:
+        return Genre[s]
+    except KeyError:
+        return None
 
 
 @pytest.mark.parametrize("file", files.mediafiles)
-def test_yaml_disallowed_genres(file: Mediafile):
-    if file.path.find(LIB1_MEDIA_PATH) != -1:
-        assert (
-            file.genre not in LIB1_DISALLOWED_GENRES
-        ), f"{file.path} (genre: {file.genre}) is prohibited by LIB1_DISALLOWED_GENRES"
-    elif file.path.find(LIB2_MEDIA_PATH) != -1:
-        assert (
-            file.genre not in LIB2_DISALLOWED_GENRES
-        ), f"{file.path} (genre: {file.genre}) is prohibited by LIB2_DISALLOWED_GENRES"
+def test_yaml_libs_genres_mode_whitelist(file: Mediafile):
+    if LIB_GENRES_MODE_BLACKLIST:
+        return
+    for idx in range(LIB_COUNT):
+        if file.path.find(LIBS_MEDIA_PATH[idx]) != -1:
+            g = genre_string_to_enum(file.genre)
+            assert (
+                g is not None and g in LIBS_GENRES[idx]
+            ), f"{file.path} (genre: {file.genre}) is not allowed by by LIB{idx+1}_GENRES"
+
+
+@pytest.mark.parametrize("file", files.mediafiles)
+def test_yaml_libs_genres_mode_blacklist(file: Mediafile):
+    if not LIB_GENRES_MODE_BLACKLIST:
+        return
+    for idx in range(LIB_COUNT):
+        if file.path.find(LIBS_MEDIA_PATH[idx]) != -1:
+            g = genre_string_to_enum(file.genre)
+            assert (
+                g is not None and g not in LIBS_GENRES[idx]
+            ), f"{file.path} (genre: {file.genre}) is prohibited by LIB{idx+1}_GENRES"
 
 
 @pytest.mark.parametrize("file", files.mediafiles)

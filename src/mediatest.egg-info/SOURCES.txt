@@ -1,0 +1,14 @@
+LICENSE.txt
+README.md
+pyproject.toml
+src/mediatest/__init__.py
+src/mediatest/genres.py
+src/mediatest/mediatest.py
+src/mediatest/package_data.dat
+src/mediatest.egg-info/PKG-INFO
+src/mediatest.egg-info/SOURCES.txt
+src/mediatest.egg-info/dependency_links.txt
+src/mediatest.egg-info/entry_points.txt
+src/mediatest.egg-info/requires.txt
+src/mediatest.egg-info/top_level.txt
+tests/test_media.py
