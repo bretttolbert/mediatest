@@ -5,7 +5,7 @@ import pytest
 import os
 import re
 import sys
-from typing import Dict, List, Set
+from typing import Dict, List, Optional, Set
 
 from dataclasses import dataclass
 from datetime import datetime
@@ -106,6 +106,7 @@ LIBS_GENRES: List[List[Genre]] = [
         Genre.Pop,
         Genre.PopFrançaise,
         Genre.PopItaliano,
+        Genre.PopPunk,
         Genre.PopRock,
         Genre.PostBlackMetal,
         Genre.PostHardcore,
@@ -121,6 +122,7 @@ LIBS_GENRES: List[List[Genre]] = [
         Genre.PunkRock,
         Genre.RnB,
         Genre.RnBFunk,
+        Genre.RnBInstrumental,
         Genre.RnBSoul,
         Genre.Reggaeton,
         Genre.ReggaeRock,
@@ -186,6 +188,7 @@ LIBS_GENRES: List[List[Genre]] = [
         Genre.EmoPopRock,
         Genre.Folk,
         Genre.FolkPunk,
+        Genre.FolkRock,
         Genre.FolkRockJazz,
         Genre.FunkInstrumental,
         Genre.Gospel,
@@ -194,6 +197,7 @@ LIBS_GENRES: List[List[Genre]] = [
         Genre.HipHopElectronic,
         Genre.HipHopInstrumental,
         Genre.HonkyTonk,
+        Genre.HorrorPunk,
         Genre.IndieFolk,
         Genre.Industrial,
         Genre.IndustrialMetal,
@@ -541,6 +545,13 @@ def get_all_genre_strings() -> List[str]:
     return [g.value for g in Genre]
 
 
+def genre_string_to_enum(s: str) -> Optional[Genre]:
+    for genre in Genre:
+        if genre.value == s:
+            return genre
+    return None
+
+
 @pytest.mark.parametrize("file", files.mediafiles)
 def test_yaml_allowed_genres(file: Mediafile):
     assert file.genre in get_all_genre_strings(), f"{file.path}"
@@ -578,13 +589,6 @@ def test_lib_genres_all_genres_used():
             pytest.exit("Genre not in any lib genres: " + genre)
 
 
-def genre_string_to_enum(s: str):
-    try:
-        return Genre[s]
-    except KeyError:
-        return None
-
-
 @pytest.mark.parametrize("file", files.mediafiles)
 def test_yaml_libs_genres_mode_whitelist(file: Mediafile):
     if LIB_GENRES_MODE_BLACKLIST:
@@ -594,7 +598,7 @@ def test_yaml_libs_genres_mode_whitelist(file: Mediafile):
             g = genre_string_to_enum(file.genre)
             assert (
                 g is not None and g in LIBS_GENRES[idx]
-            ), f"{file.path} (genre: {file.genre}) is not allowed by by LIB{idx+1}_GENRES"
+            ), f"{file.path} (genre: {file.genre}) is not allowed by by LIB{idx+1} LIBS_GENRES"
 
 
 @pytest.mark.parametrize("file", files.mediafiles)
@@ -606,7 +610,7 @@ def test_yaml_libs_genres_mode_blacklist(file: Mediafile):
             g = genre_string_to_enum(file.genre)
             assert (
                 g is not None and g not in LIBS_GENRES[idx]
-            ), f"{file.path} (genre: {file.genre}) is prohibited by LIB{idx+1}_GENRES"
+            ), f"{file.path} (genre: {file.genre}) is prohibited by LIB{idx+1} LIBS_GENRES"
 
 
 @pytest.mark.parametrize("file", files.mediafiles)
