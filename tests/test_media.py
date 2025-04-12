@@ -106,7 +106,6 @@ LIBS_GENRES: List[List[Genre]] = [
         Genre.Pop,
         Genre.PopFrançaise,
         Genre.PopItaliano,
-        Genre.PostPunk,
         Genre.PopRock,
         Genre.PostBlackMetal,
         Genre.PostHardcore,
