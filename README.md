@@ -5,11 +5,19 @@ The idea is to write tests to enforce rules for your media collection.
 
 ## Basic Usage
 
-Update settings in [tests/test_media.py](./tests/test_media.py) as needed, then:
+Update settings in [tests/test_config.py](./tests/test_config.py) as needed, then:
 
 ```bash
 pip install .
 pytest .
+```
+
+## Advanced Usage
+
+Only run filesystem tests (and not the slower files.yaml tests):
+
+```bash
+pytest -k filesystem
 ```
 
 ## Depedencies
