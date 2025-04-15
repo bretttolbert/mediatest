@@ -1,5 +1,5 @@
 def main():
-    pass
+    print("Usage: pytest .")
 
 
 if __name__ == "__main__":

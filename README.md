@@ -43,4 +43,4 @@ Of course you can adjust the rules as desired my modifying the Python.
 
 ## Genres
 
-This library provides a comprehensive ([Genre](./src/mediatest/genres.py)) enum with string values corresponding to the expected ID3 tag values. This helps avoid inconsistencies e.g. _"Post-punk"_ vs. _"Post-Punk"_ vs. _"Post punk"_ vs. _"Post Punk"_.
+This library provides a comprehensive [Genre](./src/mediatest/genres.py) enum with string values corresponding to the expected ID3 tag values. This helps avoid inconsistencies e.g. _"Post-punk"_ vs. _"Post-Punk"_ vs. _"Post punk"_ vs. _"Post Punk"_.
