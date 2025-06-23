@@ -21,6 +21,7 @@ EXTS_ART = [
     "jpg",
     "webp",
     "png",
+    "xcf",
 ]  # intentionally lowercase for consistency, ".JPG" not allowed, etc.
 EXTS_LYRICS = ["lrc", "txt"]
 EXTS_EXTRA = ["pdf"]  # some albums include pdf booklets
@@ -29,7 +30,7 @@ ALLOWED_EXTS = EXTS_MEDIA + EXTS_ART + EXTS_LYRICS + EXTS_EXTRA
 LIB_GENRES_MODE_BLACKLIST = False  # Set to True if you want LIBS_GENRES lists to be blacklists instead of whitelists (default)
 
 # Multiple music libraries are supported.
-# For my personal use, I bifurcate my music into two libraries.
+# For my personal use, I split my music into two libraries.
 # One reason for this is because I backup my libraries to Blu-Ray M-discs for
 # long-term cold-storage and triple-layer Blu-Rays have a max capacity of 100 GB.
 # The other reason I do this is I have some Android tablets with a maximum storage
@@ -44,10 +45,10 @@ LIB_GENRES_MODE_BLACKLIST = False  # Set to True if you want LIBS_GENRES lists t
 # Variables beginning with LIBS_ are arrays of size LIB_COUNT
 LIB_COUNT = 2
 LIBS_MEDIA_PATH = ["/data/Music/", "/data/MusicOther/"]
-LIBS_EXPECTED_MEDIA_COUNT = [10450, 8723]
+LIBS_EXPECTED_MEDIA_COUNT = [10884, 8913]
 LIBS_EXPECTED_LRC_COUNT = [6229, 2969]
 LIBS_TOTAL_FILESIZE_LIMIT_GB = [100, 100]
-LIBS_EXPECTED_FILESIZE_GB = [79, 68]
+LIBS_EXPECTED_FILESIZE_GB = [82, 69]
 LIBS_GENRES: List[List[Genre]] = [
     [
         Genre.Afrobeat,
@@ -72,6 +73,7 @@ LIBS_GENRES: List[List[Genre]] = [
         Genre.FunkSoul,
         Genre.Funktronica,
         Genre.GlamRock,
+        Genre.GlamMetal,
         Genre.Grunge,
         Genre.HeavyMetal,
         Genre.HipHop,
@@ -84,6 +86,7 @@ LIBS_GENRES: List[List[Genre]] = [
         Genre.KPop,
         Genre.KoreanRock,
         Genre.Latin,
+        Genre.LatinFunk,
         Genre.LatinPop,
         Genre.Motown,
         Genre.NeoSoul,
@@ -132,6 +135,7 @@ LIBS_GENRES: List[List[Genre]] = [
         Genre.Techno,
         Genre.ThrashMetal,
         Genre.TraditionalPop,
+        Genre.Trance,
         Genre.TripHop,
         Genre.UkrainianPop,
         Genre.Urbano,
