@@ -56,8 +56,26 @@ def do_test_allowed_exts(media_path: str):
     for _, _, files in os.walk(media_path, topdown=False):
         for name in files:
             ext = get_file_ext(name)
-            assert ext in ALLOWED_EXTS, "{} not in allowed extensions".format(name)
+            assert ext in ALLOWED_EXTS, f"{name} not in allowed extensions"
     print(count)
+
+
+# '’' is prohibited because it's problematic with ID3 tags (converts to '?' if ripped from CD),
+# so I need to check the tags on these files and change '?' to ''' if needed.
+FILENAME_PROHIBITED_CHARS = '’'
+
+
+def do_test_filenames(media_path: str):
+    failing = []
+    for _, _, files in os.walk(media_path, topdown=False):
+        for name in files:
+            for c in FILENAME_PROHIBITED_CHARS:
+                if c in name:
+                    fail = f"character {c} not allowed in filename {name}"
+                    print(fail)
+                    failing.append(fail)
+    print(f"do_test_filenames fail count: {len(failing)}")
+    assert failing == []
 
 
 def do_test_media_file_count(
@@ -193,6 +211,11 @@ def do_test_album_cover_jpg(media_path: str):
 @pytest.mark.parametrize("media_path", LIBS_MEDIA_PATH)
 def test_allowed_exts(media_path: str):
     do_test_allowed_exts(media_path)
+
+
+@pytest.mark.parametrize("media_path", LIBS_MEDIA_PATH)
+def test_filenames(media_path: str):
+    do_test_filenames(media_path)
 
 
 @pytest.mark.parametrize("lib_idx", list(range(LIB_COUNT)))
