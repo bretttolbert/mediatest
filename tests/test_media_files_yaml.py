@@ -5,20 +5,9 @@ import pytest
 import sys
 from typing import Dict, List, Optional, Set
 
-from mediascan import Genre, MediaFiles, MediaFile
+from mediascan import load_files_yaml, Genre, MediaFiles, MediaFile
 
 from tests.test_config import *
-
-
-def load_files_yaml(yaml_fname: str) -> MediaFiles:
-    files = None
-    with open(yaml_fname, "r") as stream:
-        try:
-            files = MediaFiles.from_yaml(stream)  # type: ignore
-        except yaml.YAMLError as exc:
-            sys.exit(1)
-    return files  # type: ignore
-
 
 files = load_files_yaml(MEDIASCAN_FILES_PATH)
 
