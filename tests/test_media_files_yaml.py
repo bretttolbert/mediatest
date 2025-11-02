@@ -5,75 +5,41 @@ import pytest
 import sys
 from typing import Dict, List, Optional, Set
 
-from dataclasses import dataclass
-
-from dataclass_wizard import YAMLWizard  # type: ignore
-
-from mediatest.genres import Genre
+from mediascan import Genre, MediaFiles, MediaFile
 
 from tests.test_config import *
 
 
-@dataclass
-class Mediafile:
-    """
-    Mediafile dataclass
-
-    """
-
-    path: str
-    size: int
-    format: str
-    title: str
-    artist: str
-    albumartist: str
-    album: str
-    genre: str
-    year: int
-    duration: int
-
-
-@dataclass
-class Data(YAMLWizard):  # type: ignore
-    """
-    Data dataclass
-
-    """
-
-    mediafiles: list[Mediafile]
-
-
-def load_yaml_file(yaml_fname: str) -> Data:
-    data = None
+def load_files_yaml(yaml_fname: str) -> MediaFiles:
+    files = None
     with open(yaml_fname, "r") as stream:
         try:
-            data = Data.from_yaml(stream)  # type: ignore
+            files = MediaFiles.from_yaml(stream)  # type: ignore
         except yaml.YAMLError as exc:
-            print(exc)
             sys.exit(1)
-    return data  # type: ignore
+    return files  # type: ignore
 
 
-files = load_yaml_file(MEDIASCAN_FILES_PATH)
+files = load_files_yaml(MEDIASCAN_FILES_PATH)
 
 
 @pytest.fixture(scope="session")
-def files_yaml_file() -> Data:
-    return load_yaml_file(MEDIASCAN_FILES_PATH)
+def files_yaml_file() -> MediaFiles:
+    return files
 
 
-@pytest.mark.parametrize("file", files.mediafiles)
-def test_yaml_year_gt_zero(file: Mediafile):
+@pytest.mark.parametrize("file", files.files)
+def test_yaml_year_gt_zero(file: MediaFile):
     assert file.year > 0, f"{file.path}"
 
 
-@pytest.mark.parametrize("file", files.mediafiles)
-def test_yaml_years_lt_present(file: Mediafile):
+@pytest.mark.parametrize("file", files.files)
+def test_yaml_years_lt_present(file: MediaFile):
     assert file.year <= PRESENT_YEAR, f"{file.path}"
 
 
-@pytest.mark.parametrize("file", files.mediafiles)
-def test_yaml_size_gt_min(file: Mediafile):
+@pytest.mark.parametrize("file", files.files)
+def test_yaml_size_gt_min(file: MediaFile):
     assert file.size >= MINIMUM_FILESIZE, f"{file.path}"
 
 
@@ -88,8 +54,8 @@ def genre_string_to_enum(s: str) -> Optional[Genre]:
     return None
 
 
-@pytest.mark.parametrize("file", files.mediafiles)
-def test_yaml_allowed_genres(file: Mediafile):
+@pytest.mark.parametrize("file", files.files)
+def test_yaml_allowed_genres(file: MediaFile):
     assert file.genre in get_all_genre_strings(), f"{file.path}"
 
 
@@ -125,8 +91,8 @@ def test_lib_genres_all_genres_used():
             pytest.exit("Genre not in any lib genres: " + genre)
 
 
-@pytest.mark.parametrize("file", files.mediafiles)
-def test_yaml_libs_genres_mode_whitelist(file: Mediafile):
+@pytest.mark.parametrize("file", files.files)
+def test_yaml_libs_genres_mode_whitelist(file: MediaFile):
     if LIB_GENRES_MODE_BLACKLIST:
         return
     for idx in range(LIB_COUNT):
@@ -137,8 +103,8 @@ def test_yaml_libs_genres_mode_whitelist(file: Mediafile):
             ), f"{file.path} (genre: {file.genre}) is not allowed by by LIB{idx+1} LIBS_GENRES"
 
 
-@pytest.mark.parametrize("file", files.mediafiles)
-def test_yaml_libs_genres_mode_blacklist(file: Mediafile):
+@pytest.mark.parametrize("file", files.files)
+def test_yaml_libs_genres_mode_blacklist(file: MediaFile):
     if not LIB_GENRES_MODE_BLACKLIST:
         return
     for idx in range(LIB_COUNT):
@@ -149,13 +115,13 @@ def test_yaml_libs_genres_mode_blacklist(file: Mediafile):
             ), f"{file.path} (genre: {file.genre}) is prohibited by LIB{idx+1} LIBS_GENRES"
 
 
-@pytest.mark.parametrize("file", files.mediafiles)
-def test_yaml_artist_is_not_empty(file: Mediafile):
+@pytest.mark.parametrize("file", files.files)
+def test_yaml_artist_is_not_empty(file: MediaFile):
     assert len(file.artist) > 0, f"{file.path}"
 
 
-@pytest.mark.parametrize("file", files.mediafiles)
-def test_yaml_albumartist_is_not_empty(file: Mediafile):
+@pytest.mark.parametrize("file", files.files)
+def test_yaml_albumartist_is_not_empty(file: MediaFile):
     assert len(file.albumartist) > 0, f"{file.path}"
 
 
@@ -165,7 +131,7 @@ def test_yaml_albumartist_same_for_every_track_in_every_album():
     but all tracks in a an albums should have the same albumartist e.g. "Dr. Dre"
     """
     albums: Dict[str, str] = {}
-    for file in files.mediafiles:
+    for file in files.files:
         albumkey = f"{file.albumartist} - {file.album} [{file.year}]"
         if albumkey in albums:
             assert albums[albumkey] == file.albumartist
