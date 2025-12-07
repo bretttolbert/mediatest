@@ -45,10 +45,10 @@ LIB_GENRES_MODE_BLACKLIST = False  # Set to True if you want LIBS_GENRES lists t
 # Variables beginning with LIBS_ are arrays of size LIB_COUNT
 LIB_COUNT = 2
 LIBS_MEDIA_PATH = ["/data/Music/", "/data/MusicOther/"]
-LIBS_EXPECTED_MEDIA_COUNT = [11188, 9286]
+LIBS_EXPECTED_MEDIA_COUNT = [11192, 9286]
 LIBS_EXPECTED_LRC_COUNT = [7207, 4239]
 LIBS_TOTAL_FILESIZE_LIMIT_GB = [100, 100]
-LIBS_EXPECTED_FILESIZE_GB = [84, 73]
+LIBS_EXPECTED_FILESIZE_GB = [85, 73]
 LIBS_GENRES: List[List[Genre]] = [
     [
         Genre.Afrobeat,
