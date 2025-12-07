@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from mediatest.genres import Genre
+from mediascan import Genre
 
 from typing import List
 
