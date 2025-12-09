@@ -1,8 +1,4 @@
-# !/usr/bin/python3
-from __future__ import annotations
-import yaml
 import pytest
-import sys
 from typing import Dict, List, Optional, Set
 
 from mediascan import load_files_yaml, Genre, MediaFiles, MediaFile
@@ -10,6 +6,42 @@ from mediascan import load_files_yaml, Genre, MediaFiles, MediaFile
 from tests.test_config import *
 
 files = load_files_yaml(MEDIASCAN_FILES_PATH)
+
+
+NO_ERRORS = "(no errors)"
+
+
+def run_tests() -> List[str]:
+    errors: List[str] = []
+    errors += run_test_yaml("artist")
+    errors += run_test_yaml("albumartist")
+    errors += run_test_yaml("album", "albumartist")
+    return errors
+
+
+def pytest_generate_tests(metafunc):
+    """Indirect parametrization for pytest to run
+    test_per_error for each error found.
+    parametrizes with a list of errors or [NO_ERRORS]
+    i.e. the length of the list is at least 1
+    (the sentinel value element NO_ERRORS allows
+    at least one test to run and pass,
+    otherwise the test would just be greyed out)
+    """
+    if "error" in metafunc.fixturenames:
+        errors = run_tests()
+        if len(errors) == 0:
+            errors.append(NO_ERRORS)
+        metafunc.parametrize("error", errors)
+
+
+def test_per_error(error: str):
+    """Test that fails for each error found.
+    If there are no errors, it will run once and pass.
+    Works with pytest using indirect parametrization.
+    (See pytest_generate_tests above)
+    """
+    assert error == NO_ERRORS
 
 
 @pytest.fixture(scope="session")
@@ -126,3 +158,39 @@ def test_yaml_albumartist_same_for_every_track_in_every_album():
             assert albums[albumkey] == file.albumartist
         else:
             albums[albumkey] = file.albumartist
+
+
+def run_test_yaml(tag_type: str, tag_type_2: Optional[str] = None) -> List[str]:
+    """
+    tag_type: the tag to test
+    tag_type_2: optional secondary qualifier, makes it skip validation if tag_type_2
+    doesn't match. E.g. tag_type="album" and tag_type_2="artist" => only compare
+    two albums if the artist is the same for both of them.
+    """
+    errors: List[str] = []
+    grouped: Dict[str, List[MediaFile]] = {}
+    for file in files.files:
+        key = str(getattr(file, tag_type)).upper()
+        if key in grouped:
+            grouped[key].append(file)
+        else:
+            grouped[key] = [file]
+    for _, v_l in grouped.items():
+        f0 = v_l[0]
+        for f in v_l[1:]:
+            v1 = getattr(f, tag_type)
+            v2 = getattr(f0, tag_type)
+            if v1 != v2:
+                if tag_type_2 is not None:
+                    v2_1 = getattr(f0, tag_type_2)
+                    v2_2 = getattr(f, tag_type_2)
+                    if v2_1 != v2_2:
+                        # e.g. albums with different capitalizaiton but different albumartists
+                        # so it doesn't really matter so much
+                        continue
+                errors.append(
+                    f"{tag_type.capitalize()} {f.artist} - {f.album} - {f.title} "
+                    + f"tagged with inconsistent case-sensitivity ({v1} != {v2}) "
+                    + f"\nf1={f0}\nf2={f}"
+                )
+    return errors
