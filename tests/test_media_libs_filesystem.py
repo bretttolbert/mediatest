@@ -62,7 +62,13 @@ def do_test_allowed_exts(media_path: str):
 
 # '’' is prohibited because it's problematic with ID3 tags (converts to '?' if ripped from CD),
 # so I need to check the tags on these files and change '?' to ''' if needed.
-FILENAME_PROHIBITED_CHARS = '’'
+# also disallow both regular question mark and weird unicode question mark
+# >>> ord('?')
+# 63
+# >>> ord('？')
+# 65311
+
+FILENAME_PROHIBITED_CHARS = "’？?"
 
 
 def do_test_filenames(media_path: str):

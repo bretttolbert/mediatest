@@ -118,7 +118,7 @@ classifiers = [
 #
 # For an analysis of this field vs pip's requirements files see:
 # https://packaging.python.org/discussions/install-requires-vs-requirements/
-dependencies = ["peppercorn", "pyaml", "dataclass-wizard"]
+dependencies = ["pytest", "peppercorn", "pyaml", "dataclass-wizard"]
 
 # List additional groups of dependencies here (e.g. development
 # dependencies). Users will be able to install these using the "extras"
@@ -161,4 +161,35 @@ mediatest = "mediatest:main"
 [tool.setuptools]
 # If there are data files included in your packages that need to be
 # installed, specify them here.
-package-data = { "mediatest" = ["*.dat"] }
+package-data = { "mediascan" = ["*.dat"] }
+
+[tool.setuptools.packages]
+find = {}
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "."
+]
+testpaths = [
+    "tests"
+]
+norecursedirs = [
+    ".git",
+    ".tox",
+    "build",
+    "dist",
+    "venv",
+    "docs",
+    "__pycache__",
+    "scripts",
+    "out"
+]
+addopts = [
+    "--ignore=.git",
+    "--ignore=.tox",
+    "--ignore=build",
+    "--ignore=dist",
+    "--ignore=__pycache__",
+    "--ignore=scripts",
+    "--ignore=out"
+]
