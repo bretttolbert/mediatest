@@ -24,10 +24,13 @@ EXTS_ART = [
     "xcf",
 ]  # intentionally lowercase for consistency, ".JPG" not allowed, etc.
 EXTS_LYRICS = ["lrc", "txt"]
+EXTS_METADATA = ["yaml"]
 EXTS_EXTRA = ["pdf"]  # some albums include pdf booklets
-ALLOWED_EXTS = EXTS_MEDIA + EXTS_ART + EXTS_LYRICS + EXTS_EXTRA
+ALLOWED_EXTS = EXTS_MEDIA + EXTS_ART + EXTS_LYRICS + EXTS_METADATA + EXTS_EXTRA
 
-LIB_GENRES_MODE_BLACKLIST = False  # Set to True if you want LIBS_GENRES lists to be blacklists instead of whitelists (default)
+LIB_GENRES_MODE_BLACKLIST = (
+    False  # Set to True if you want LIBS_GENRES lists to be blacklists instead of whitelists (default)
+)
 
 # Multiple music libraries are supported.
 # For my personal use, I split my music into two libraries.
@@ -45,10 +48,10 @@ LIB_GENRES_MODE_BLACKLIST = False  # Set to True if you want LIBS_GENRES lists t
 # Variables beginning with LIBS_ are arrays of size LIB_COUNT
 LIB_COUNT = 2
 LIBS_MEDIA_PATH = ["/data/Music/", "/data/MusicOther/"]
-LIBS_EXPECTED_MEDIA_COUNT = [11223, 9299]
-LIBS_EXPECTED_LRC_COUNT = [7206, 4239]
+LIBS_EXPECTED_MEDIA_COUNT = [11314, 9474]
+LIBS_EXPECTED_LRC_COUNT = [7208, 4237]
 LIBS_TOTAL_FILESIZE_LIMIT_GB = [100, 100]
-LIBS_EXPECTED_FILESIZE_GB = [85, 73]
+LIBS_EXPECTED_FILESIZE_GB = [86, 74]
 LIBS_GENRES: List[List[Genre]] = [
     [
         Genre.Afrobeat,
@@ -125,6 +128,7 @@ LIBS_GENRES: List[List[Genre]] = [
         Genre.RockFrançais,
         Genre.RockItaliano,
         Genre.RussianPop,
+        Genre.Salsa,
         Genre.SkaPunk,
         Genre.SludgeMetal,
         Genre.SophistiPop,
@@ -223,6 +227,7 @@ LIBS_GENRES: List[List[Genre]] = [
         Genre.SouthernRock,
         Genre.SpeechSample,
         Genre.StonerRock,
+        Genre.SufiRock,
         Genre.Swing,
         Genre.Volksmusik,
         Genre.Zydeco,
