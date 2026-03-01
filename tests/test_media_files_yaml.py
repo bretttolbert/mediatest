@@ -13,9 +13,9 @@ NO_ERRORS = "(no errors)"
 
 def run_tests() -> List[str]:
     errors: List[str] = []
-    errors += run_test_yaml("artist")
-    errors += run_test_yaml("albumartist")
-    errors += run_test_yaml("album", "albumartist")
+    errors += run_test_mediafile("artist")
+    errors += run_test_mediafile("albumartist")
+    errors += run_test_mediafile("album", "albumartist")
     return errors
 
 
@@ -50,17 +50,17 @@ def files_yaml_file() -> MediaFiles:
 
 
 @pytest.mark.parametrize("file", files.files)
-def test_yaml_year_gt_zero(file: MediaFile):
+def test_mediafile_year_gt_zero(file: MediaFile):
     assert file.year > 0, f"{file.path}"
 
 
 @pytest.mark.parametrize("file", files.files)
-def test_yaml_years_lt_present(file: MediaFile):
+def test_mediafile_years_lt_present(file: MediaFile):
     assert file.year <= PRESENT_YEAR, f"{file.path}"
 
 
 @pytest.mark.parametrize("file", files.files)
-def test_yaml_size_gt_min(file: MediaFile):
+def test_mediafile_size_gt_min(file: MediaFile):
     assert file.size >= MINIMUM_FILESIZE, f"{file.path}"
 
 
@@ -76,7 +76,7 @@ def genre_string_to_enum(s: str) -> Optional[Genre]:
 
 
 @pytest.mark.parametrize("file", files.files)
-def test_yaml_allowed_genres(file: MediaFile):
+def test_mediafile_allowed_genres(file: MediaFile):
     assert file.genre in get_all_genre_strings(), f"{file.path}"
 
 
@@ -96,9 +96,7 @@ def test_lib_genres_no_intersections():
             return
         intersection = set(LIBS_GENRES[idx]) & set(LIBS_GENRES[idx + 1])
         if len(intersection):
-            pytest.exit(
-                f"Duplicate genres in both LIB{idx+1} and LIB{idx+2}: {str(intersection)}"
-            )
+            pytest.exit(f"Duplicate genres in both LIB{idx+1} and LIB{idx+2}: {str(intersection)}")
 
 
 def test_lib_genres_all_genres_used():
@@ -113,7 +111,7 @@ def test_lib_genres_all_genres_used():
 
 
 @pytest.mark.parametrize("file", files.files)
-def test_yaml_libs_genres_mode_whitelist(file: MediaFile):
+def test_mediafile_libs_genres_mode_whitelist(file: MediaFile):
     if LIB_GENRES_MODE_BLACKLIST:
         return
     for idx in range(LIB_COUNT):
@@ -125,7 +123,7 @@ def test_yaml_libs_genres_mode_whitelist(file: MediaFile):
 
 
 @pytest.mark.parametrize("file", files.files)
-def test_yaml_libs_genres_mode_blacklist(file: MediaFile):
+def test_mediafile_libs_genres_mode_blacklist(file: MediaFile):
     if not LIB_GENRES_MODE_BLACKLIST:
         return
     for idx in range(LIB_COUNT):
@@ -137,16 +135,16 @@ def test_yaml_libs_genres_mode_blacklist(file: MediaFile):
 
 
 @pytest.mark.parametrize("file", files.files)
-def test_yaml_artist_is_not_empty(file: MediaFile):
+def test_mediafile_artist_is_not_empty(file: MediaFile):
     assert len(file.artist) > 0, f"{file.path}"
 
 
 @pytest.mark.parametrize("file", files.files)
-def test_yaml_albumartist_is_not_empty(file: MediaFile):
+def test_mediafile_albumartist_is_not_empty(file: MediaFile):
     assert len(file.albumartist) > 0, f"{file.path}"
 
 
-def test_yaml_albumartist_same_for_every_track_in_every_album():
+def test_mediafile_albumartist_same_for_every_track_in_every_album():
     """
     Different tracks may have different artists e.g. "Dr. Dre feat. Snoop Dog"
     but all tracks in a an albums should have the same albumartist e.g. "Dr. Dre"
@@ -160,7 +158,7 @@ def test_yaml_albumartist_same_for_every_track_in_every_album():
             albums[albumkey] = file.albumartist
 
 
-def run_test_yaml(tag_type: str, tag_type_2: Optional[str] = None) -> List[str]:
+def run_test_mediafile(tag_type: str, tag_type_2: Optional[str] = None) -> List[str]:
     """
     tag_type: the tag to test
     tag_type_2: optional secondary qualifier, makes it skip validation if tag_type_2

@@ -30,5 +30,6 @@
         "**/*.code-search": true,
         "**/.git": true,
         "**/build": true
-    }
+    },
+    "python-envs.pythonProjects": []
 }
