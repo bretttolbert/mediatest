@@ -57,6 +57,7 @@ LIBS_GENRES: List[List[Genre]] = [
         Genre.Afrobeat,
         Genre.Afropop,
         Genre.ArtPunk,
+        Genre.BluesRock,
         Genre.ClassicPop,
         Genre.ClassicRock,
         Genre.CountryPop,
@@ -145,6 +146,8 @@ LIBS_GENRES: List[List[Genre]] = [
         Genre.Urbano,
         Genre.World,
         Genre.Zamrock,
+        Genre.Merengue,
+        Genre.Bachata,
     ],
     [
         Genre.AcidPunk,

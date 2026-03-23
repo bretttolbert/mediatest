@@ -12,7 +12,7 @@
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "python.testing.pytestArgs": ["-vv"],
-    "python.defaultInterpreterPath": "../env/bin/python",
+    "python.defaultInterpreterPath": "/home/brett/Git/bretttolbert/mediax/env/bin/python",
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,
