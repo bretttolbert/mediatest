@@ -48,10 +48,10 @@ LIB_GENRES_MODE_BLACKLIST = (
 # Variables beginning with LIBS_ are arrays of size LIB_COUNT
 LIB_COUNT = 2
 LIBS_MEDIA_PATH = ["/data/Music/", "/data/MusicOther/"]
-LIBS_EXPECTED_MEDIA_COUNT = [11396, 9560]
-LIBS_EXPECTED_LRC_COUNT = [7271, 4278]
+LIBS_EXPECTED_MEDIA_COUNT = [11691, 9888]
+LIBS_EXPECTED_LRC_COUNT = [7248, 4299]
 LIBS_TOTAL_FILESIZE_LIMIT_GB = [100, 100]
-LIBS_EXPECTED_FILESIZE_GB = [86, 75]
+LIBS_EXPECTED_FILESIZE_GB = [89, 78]
 LIBS_GENRES: List[List[Genre]] = [
     [
         Genre.Afrobeat,
@@ -156,6 +156,7 @@ LIBS_GENRES: List[List[Genre]] = [
         Genre.AlternativeMetal,
         Genre.AlternativeRock,
         Genre.Ambient,
+        Genre.ArtPop,
         Genre.ArtRock,
         Genre.BigBand,
         Genre.BlackMetal,
@@ -202,6 +203,7 @@ LIBS_GENRES: List[List[Genre]] = [
         Genre.IndieFolk,
         Genre.Industrial,
         Genre.IndustrialMetal,
+        Genre.JamRock,
         Genre.Jazz,
         Genre.JazzFunk,
         Genre.JazzPop,

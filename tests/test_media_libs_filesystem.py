@@ -4,6 +4,8 @@ import pytest
 import os
 import re
 
+from mediascan import AlbumPath, AlbumPathBuilder
+
 from tests.test_config import *
 
 
@@ -84,9 +86,7 @@ def do_test_filenames(media_path: str):
     assert failing == []
 
 
-def do_test_media_file_count(
-    media_path: str, expected_media_count: int, expected_lrc_count: int
-):
+def do_test_media_file_count(media_path: str, expected_media_count: int, expected_lrc_count: int):
     count_media = 0
     count_mp3 = 0
     count_m4a = 1
@@ -136,7 +136,6 @@ def do_test_no_empty_dirs(media_path: str):
 def do_test_album_dir_name(media_path: str):
     # prohibit chars not allowed in windows filenames
     # and other problematic characters
-    album_pattern = re.compile(r'[^:\?&#%{}\\\.`$!<>\*"+|=]*\[\d+(-\d+)?\]')
     base_depth = get_path_depth(media_path)
     count = 0
     match_count = 0
@@ -148,32 +147,13 @@ def do_test_album_dir_name(media_path: str):
             # 2 = album [year] dir
             if current_depth - base_depth == 2:
                 count += 1
-                if album_pattern.match(name) and not string_contains_trailing_space(
-                    name
-                ):
-                    # test album year format (4 digits)
-                    album_year = 0
-                    try:
-                        tokens: List[str] = re.findall(r"\[(\d{4})\]", name)
-                        album_year = int(tokens[-1])
-                        match_count += 1
-                        print(album_year)
-                    except Exception:
-                        print(
-                            "bad album dir name format (invalid year): {}".format(
-                                fullpath
-                            )
-                        )
+                album_path = AlbumPathBuilder.of(fullpath)
+                if album_path.valid:
+                    match_count += 1
                 else:
                     print("bad album dir name format: {}".format(fullpath))
-    print(
-        "test_dir_name: bad album dir format: {} out of {}".format(
-            count - match_count, count
-        )
-    )
-    print(
-        "test_dir_name: good album dir format: {} out of {}".format(match_count, count)
-    )
+    print("test_dir_name: bad album dir format: {} out of {}".format(count - match_count, count))
+    print("test_dir_name: good album dir format: {} out of {}".format(match_count, count))
     assert count == match_count, "One or more invalid album names"
 
 
@@ -198,16 +178,8 @@ def do_test_album_cover_jpg(media_path: str):
                     match_count += 1
                 else:
                     print("Missing cover.jpg dir: {}".format(fullpath))
-    print(
-        "test_album_cover_jpg: Missing cover.jpg dir: {} out of {}".format(
-            count - match_count, count
-        )
-    )
-    print(
-        "test_album_cover_jpg: has cover.jpg dir: {} out of {}".format(
-            match_count, count
-        )
-    )
+    print("test_album_cover_jpg: Missing cover.jpg dir: {} out of {}".format(count - match_count, count))
+    print("test_album_cover_jpg: has cover.jpg dir: {} out of {}".format(match_count, count))
     assert count == match_count, "One or more album dirs missing cover.jpg"
 
 
