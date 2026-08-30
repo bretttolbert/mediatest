@@ -1,19 +1,17 @@
-from __future__ import annotations
-
-from mediascan import Genre
-
 from typing import List
-
 from datetime import datetime
+
+from mediascan import Genre # type: ignore
+
+from mediatest.path_utils import KILOBYTE
+
 
 # For running tests on the yaml file output by mediascan
 # E.g. for ID3-tag tests
 # E.g. testing if year is a valid year or something weird like 0
 MEDIASCAN_FILES_PATH = "../mediascan/out/files.yaml"
 
-KILOBYTE = 10**3
-MEGABYTE = 10**6
-GIGABYTE = 10**9
+
 PRESENT_YEAR: int = datetime.now().year
 MINIMUM_FILESIZE = 10 * KILOBYTE
 EXTS_MEDIA = ["mp3", "m4a"]

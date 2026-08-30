@@ -118,7 +118,7 @@ classifiers = [
 #
 # For an analysis of this field vs pip's requirements files see:
 # https://packaging.python.org/discussions/install-requires-vs-requirements/
-dependencies = ["pytest", "peppercorn", "pyaml", "dataclass-wizard"]
+dependencies = ["pytest", "peppercorn", "pyaml", "dataclass-wizard", "mediascan>=1.0.1"]
 
 # List additional groups of dependencies here (e.g. development
 # dependencies). Users will be able to install these using the "extras"
@@ -178,6 +178,7 @@ norecursedirs = [
     ".tox",
     "build",
     "dist",
+    "env",
     "venv",
     "docs",
     "__pycache__",

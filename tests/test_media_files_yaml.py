@@ -2,7 +2,7 @@ import pytest
 from typing import Dict, List, Optional, Set
 from pathlib import Path
 
-from mediascan import load_files_yaml, Genre, MediaFiles, MediaFile
+from mediascan import load_files_yaml, Genre, MediaFiles, MediaFile # type: ignore
 
 from tests.test_config import *
 
@@ -20,7 +20,7 @@ def run_tests() -> List[str]:
     return errors
 
 
-def pytest_generate_tests(metafunc):
+def pytest_generate_tests(metafunc): # type: ignore
     """Indirect parametrization for pytest to run
     test_per_error for each error found.
     parametrizes with a list of errors or [NO_ERRORS]
@@ -29,11 +29,11 @@ def pytest_generate_tests(metafunc):
     at least one test to run and pass,
     otherwise the test would just be greyed out)
     """
-    if "error" in metafunc.fixturenames:
+    if "error" in metafunc.fixturenames: # type: ignore
         errors = run_tests()
         if len(errors) == 0:
             errors.append(NO_ERRORS)
-        metafunc.parametrize("error", errors)
+        metafunc.parametrize("error", errors) # type: ignore
 
 
 def test_per_error(error: str):
