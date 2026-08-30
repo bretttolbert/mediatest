@@ -9,7 +9,7 @@
 # https://packaging.python.org/en/latest/tutorials/packaging-projects/#choosing-a-build-backend
 [build-system]
 # A list of packages that are needed to build your package:
-requires = ["setuptools"] # REQUIRED if [build-system] table is used
+requires = ["setuptools>=61.0"] # REQUIRED if [build-system] table is used
 # The name of the Python object that frontends will use to perform the build:
 build-backend = "setuptools.build_meta" # If not defined, then legacy behavior can happen.
 
@@ -163,8 +163,8 @@ mediatest = "mediatest:main"
 # installed, specify them here.
 package-data = { "mediascan" = ["*.dat"] }
 
-[tool.setuptools.packages]
-find = {}
+[tool.setuptools.packages.find]
+where = ["src"]  # <-- This tells setuptools to scan inside src/
 
 [tool.pytest.ini_options]
 pythonpath = [

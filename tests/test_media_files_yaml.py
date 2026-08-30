@@ -1,5 +1,6 @@
 import pytest
 from typing import Dict, List, Optional, Set
+from pathlib import Path
 
 from mediascan import load_files_yaml, Genre, MediaFiles, MediaFile
 
@@ -156,6 +157,30 @@ def test_mediafile_albumartist_same_for_every_track_in_every_album():
             assert albums[albumkey] == file.albumartist
         else:
             albums[albumkey] = file.albumartist
+
+
+def escape_artist_name(name: str):
+    """
+    Escape artist/albumartist name according to rules used for mediaserver artist directory names
+    E.g. "Dr. Dre" becomes "Dr_ Dre"
+    """
+    return name.replace(".", "_")
+
+
+def test_mediafile_albumartist_matches_artist_directory_name():
+    """
+    Different tracks may have different artists e.g. "Dr. Dre feat. Snoop Dog"
+    but all tracks under a given artist folder e.g. "Dr_ Dre" should have the same albumartist e.g. "Dr. Dre"
+    and it should match the artist directory name (after escaping)
+    """
+    artists: Dict[str, str] = {}
+    for file in files.files:
+        artist_dir_name = str(Path(file.path).parent.parent.name)
+        albumartist_escaped = escape_artist_name(file.albumartist)
+        if artist_dir_name in artists:
+            assert artists[artist_dir_name] == albumartist_escaped, f"File (path={file.path}) albumartist '{file.albumartist}' (escaped={albumartist_escaped})  does not match artist directory name '{artist_dir_name}'"
+        else:
+            artists[artist_dir_name] = albumartist_escaped
 
 
 def run_test_mediafile(tag_type: str, tag_type_2: Optional[str] = None) -> List[str]:
