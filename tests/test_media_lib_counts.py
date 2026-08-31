@@ -64,7 +64,7 @@ def pytest_generate_tests(metafunc): # type: ignore
         file_size_actual.append(current_lib_file_size_actual)
 
     if "media_count_expected" in metafunc.fixturenames and "media_count_actual" in metafunc.fixturenames: # type: ignore
-        metafunc.parametrize(["media_count_actual", "media_count_expected"]], list(zip(media_counts_actual, media_counts_expected))) # type: ignore
+        metafunc.parametrize(["media_count_actual", "media_count_expected"], list(zip(media_counts_actual, media_counts_expected))) # type: ignore
 
     if "lrc_count_expected" in metafunc.fixturenames and "lrc_count_actual" in metafunc.fixturenames: # type: ignore
         metafunc.parametrize(["lrc_count_actual", "lrc_count_expected"], list(zip(lrc_counts_expected, lrc_counts_actual))) # type: ignore
