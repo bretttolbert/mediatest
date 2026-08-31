@@ -59,26 +59,21 @@ def pytest_generate_tests(metafunc): # type: ignore
 
         file_size_expected.append(LIBS_EXPECTED_FILESIZE_GB[lib_idx])
         file_size_limit.append(LIBS_TOTAL_FILESIZE_LIMIT_GB[lib_idx])
-        lib_file_size_actual = get_dir_path_filesize_gb(media_lib_path)
-        print(f"filesize={lib_file_size_actual}")
-        file_size_actual.append(lib_file_size_actual)
+        current_lib_file_size_actual = get_dir_path_filesize_gb(media_lib_path)
+        print(f"filesize={current_lib_file_size_actual}")
+        file_size_actual.append(current_lib_file_size_actual)
 
-    if "media_count_expected" in metafunc.fixturenames: # type: ignore
-        metafunc.parametrize("media_count_expected", media_counts_expected) # type: ignore
-    if "media_count_actual" in metafunc.fixturenames: # type: ignore
-        metafunc.parametrize("media_count_actual", media_counts_actual) # type: ignore
+    if "media_count_expected" in metafunc.fixturenames and "media_count_actual" in metafunc.fixturenames: # type: ignore
+        metafunc.parametrize(["media_count_actual", "media_count_expected"]], list(zip(media_counts_actual, media_counts_expected))) # type: ignore
 
-    if "lrc_count_expected" in metafunc.fixturenames: # type: ignore
-        metafunc.parametrize("lrc_count_expected", lrc_counts_expected) # type: ignore
-    if "lrc_count_actual" in metafunc.fixturenames: # type: ignore
-        metafunc.parametrize("lrc_count_actual", lrc_counts_actual) # type: ignore
+    if "lrc_count_expected" in metafunc.fixturenames and "lrc_count_actual" in metafunc.fixturenames: # type: ignore
+        metafunc.parametrize(["lrc_count_actual", "lrc_count_expected"], list(zip(lrc_counts_expected, lrc_counts_actual))) # type: ignore
 
-    if "file_size_expected" in metafunc.fixturenames: # type: ignore
-        metafunc.parametrize("file_size_expected", file_size_expected) # type: ignore
-    if "file_size_limit" in metafunc.fixturenames: # type: ignore
-        metafunc.parametrize("file_size_limit", file_size_limit) # type: ignore
-    if "file_size_actual" in metafunc.fixturenames: # type: ignore
-        metafunc.parametrize("file_size_actual", file_size_actual) # type: ignore
+    if "file_size_expected" in metafunc.fixturenames and "file_size_actual" in metafunc.fixturenames: # type: ignore
+        metafunc.parametrize(["file_size_actual", "file_size_expected"], list(zip(file_size_expected, file_size_actual))) # type: ignore
+
+    if "file_size_limit" in metafunc.fixturenames and "file_size_actual" in metafunc.fixturenames: # type: ignore
+        metafunc.parametrize(["file_size_actual", "file_size_limit"], list(zip(file_size_limit, file_size_actual))) # type: ignore
 
 
 def test_media_count(media_count_expected: int, media_count_actual: int):

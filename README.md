@@ -12,6 +12,23 @@ pip install .
 pytest .
 ```
 
+## Example Test Failure
+
+```bash
+tests/test_media_lib_counts.py:97: AssertionError
+======================================================= short test summary info ========================================================
+FAILED tests/test_media_artist_dirs.py::test_artist_yaml_exists[artist_path2151] - AssertionError: assert False
+ +  where False = exists()
+ +    where exists = PosixPath('/data/Music/Various Artists/artist.yaml').exists
+FAILED tests/test_media_files_yaml.py::test_mediafile_albumartist_matches_artist_directory_name - AssertionError: File (path=/data/Music/Crosby, Stills and Nash/Crosby, Stills and Nash - Crosby, Stills and Nash [1969]/01.01 - Suite_ Judy Blue Eyes.mp3) albumartist 'Crosby, Stills & Nash' (escaped=Crosby, Stills & Nash)  does not match artist directory name 'Crosby, Stills and Nash'
+assert 'David Crosby & Stephen Stills' == 'Crosby, Stills & Nash'
+  
+  - Crosby, Stills & Nash
+  + David Crosby & Stephen Stills
+
+```
+
+
 ## Advanced Usage
 
 Only run filesystem tests (and not the slower files.yaml tests):
